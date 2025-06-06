@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${patient.id == null ? 'New Patient' : 'Edit Patient'}">Patient Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .page-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .form-section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #34495e;
+        }
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52,152,219,0.25);
+        }
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        .btn-secondary {
+            background-color: #95a5a6;
+            border-color: #95a5a6;
+        }
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+            border-color: #7f8c8d;
+        }
+        .required-field::after {
+            content: "*";
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+        .disease-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            background-color: #e9ecef;
+            color: #495057;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .pain-level {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+        }
+        .pain-high {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .pain-medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .pain-low {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="page-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0" th:text="${patient.id == null ? 'New Patient' : 'Edit Patient'}">Patient Form</h2>
+            <a th:href="@{/patients}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Patients
+            </a>
+        </div>
+
+        <form th:action="${patient.id == null ? '/patient/new' : '/patients/' + patient.id}" 
+              th:object="${patientForm}" method="post" class="needs-validation" novalidate>
+            
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-user me-2"></i>Personal Information
+                </h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="name" class="form-label required-field">Full Name</label>
+                            <input type="text" class="form-control" id="name" 
+                                   th:field="*{name}" required>
+                            <div class="invalid-feedback">Please enter patient's name</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="age" class="form-label required-field">Age</label>
+                            <input type="number" class="form-control" id="age" 
+                                   th:field="*{age}" required min="0" max="120">
+                            <div class="invalid-feedback">Please enter a valid age</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="dateOfBirth" 
+                                   th:field="*{dateOfBirth}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="idNumber" class="form-label">ID Number</label>
+                            <input type="text" class="form-control" id="idNumber" 
+                                   th:field="*{idNumber}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-phone me-2"></i>Contact Information
+                </h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label required-field">Phone Number</label>
+                            <input type="tel" class="form-control" id="phoneNumber" 
+                                   th:field="*{phoneNumber}" required>
+                            <div class="invalid-feedback">Please enter phone number</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="street" class="form-label required-field">Street Address</label>
+                            <input type="text" class="form-control" id="street" 
+                                   th:field="*{street}" required>
+                            <div class="invalid-feedback">Please enter street address</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="city" class="form-label required-field">City</label>
+                            <input type="text" class="form-control" id="city" 
+                                   th:field="*{city}" required>
+                            <div class="invalid-feedback">Please enter city</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="state" class="form-label required-field">State</label>
+                            <input type="text" class="form-control" id="state" 
+                                   th:field="*{state}" required>
+                            <div class="invalid-feedback">Please enter state</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-heartbeat me-2"></i>Medical Information
+                </h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="painStrength" class="form-label required-field">Pain Level</label>
+                            <select class="form-select" id="painStrength" th:field="*{painStrength}" required>
+                                <option value="">Select pain level...</option>
+                                <option th:each="level : ${T(com.example.model.Strength).values()}"
+                                        th:value="${level.name()}"
+                                        th:text="${level}"
+                                        th:selected="${patient.painStrength != null && patient.painStrength.name() == level.name()}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">Please select pain level</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="diseases" class="form-label">Diseases</label>
+                            <select class="form-select" id="diseases" th:field="*{diseases}" multiple>
+                                <option th:each="disease : ${T(com.example.model.Diseases.DiseaseType).values()}"
+                                        th:value="${disease.name()}"
+                                        th:text="${disease}"
+                                        th:selected="${patient.diseases != null && patient.diseases.![diseaseType].contains(disease)}">
+                                </option>
+                            </select>
+                            <div class="form-text">Hold Ctrl/Cmd to select multiple diseases</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a th:href="@{/patients}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>
+                    <span th:text="${patient.id == null ? 'Create Patient' : 'Update Patient'}">Save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form validation
+        (function () {
+            'use strict'
+            const forms = document.querySelectorAll('.needs-validation')
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+</body>
+</html>

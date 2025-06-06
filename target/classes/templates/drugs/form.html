@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Drug Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .page-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+        .page-title {
+            color: #0d6efd;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .form-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .section-title {
+            color: #495057;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+        .btn-action {
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+        .required-field::after {
+            content: "*";
+            color: #dc3545;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="container">
+        <div class="page-container">
+            <h2 class="page-title">
+                <i class="fas fa-pills"></i>
+                <span th:text="${drug.id == null ? 'Add New Drug' : 'Edit Drug'}"></span>
+            </h2>
+            
+            <form th:action="${drug.id == null ? '/drugs' : '/drugs/' + drug.id}" 
+                  th:object="${drug}" method="post" class="needs-validation" novalidate>
+                
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i> Basic Information
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label required-field">Drug Name</label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                            <div class="invalid-feedback">Please enter the drug name.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="manufacturer" class="form-label required-field">Manufacturer</label>
+                            <input type="text" class="form-control" id="manufacturer" th:field="*{manufacturer}" required>
+                            <div class="invalid-feedback">Please enter the manufacturer.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-tags"></i> Inventory Details
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="price" class="form-label required-field">Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" required>
+                            </div>
+                            <div class="invalid-feedback">Please enter the price.</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="quantity" class="form-label required-field">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" th:field="*{quantity}" required>
+                            <div class="invalid-feedback">Please enter the quantity.</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="expiryDate" class="form-label required-field">Expiry Date</label>
+                            <input type="date" class="form-control" id="expiryDate" th:field="*{expiryDate}" required>
+                            <div class="invalid-feedback">Please enter the expiry date.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-notes-medical"></i> Additional Information
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="diseaseId" class="form-label required-field">Disease</label>
+                            <select class="form-select" id="diseaseId" name="diseaseId" required>
+                                <option value="">Select a disease</option>
+                                <option th:each="disease : ${diseases}"
+                                        th:value="${disease.id}"
+                                        th:text="${disease.diseaseType.name() + ' - ' + disease.diseaseType.treatment}"
+                                        th:selected="${drug.disease != null && drug.disease.id == disease.id}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">Please select a disease.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a th:href="@{/drugs}" class="btn btn-secondary btn-action">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-action">
+                        <i class="fas fa-save"></i> Save Drug
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+</body>
+</html> 

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>All Patients</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>All Patients</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>ID Number</th>
+                <th>Marital Status</th>
+                <th>Patient ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="patient : ${patients}">
+                <td th:text="${patient.id}"></td>
+                <td th:text="${patient.name}"></td>
+                <td th:text="${patient.age}"></td>
+                <td th:text="${patient.idNumber}"></td>
+                <td th:text="${patient.maritalStatus}"></td>
+                <td th:text="${patient.patientId}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <br/>
+    <a th:href="@{/patient/new}">Create New Patient</a>
+    <a th:href="@{/}">Home</a>
+</body>
+</html> 

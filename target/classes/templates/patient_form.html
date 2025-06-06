@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Patient Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+        .form-title {
+            color: #0d6efd;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+        .form-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .section-title {
+            color: #0d6efd;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="container">
+        <div class="form-container">
+            <h2 class="form-title"><i class="fas fa-user-plus"></i> Patient Registration</h2>
+            
+            <form th:action="@{/patient/new}" th:object="${patientForm}" method="post">
+                <!-- Personal Information -->
+                <div class="form-section">
+                    <h3 class="section-title">Personal Information</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label required-field">Full Name</label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="age" class="form-label required-field">Age</label>
+                            <input type="number" class="form-control" id="age" th:field="*{age}" required min="0" max="120">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="idNumber" class="form-label">ID Number</label>
+                            <input type="text" class="form-control" id="idNumber" th:field="*{idNumber}">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('idNumber')}" th:errors="*{idNumber}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="form-section">
+                    <h3 class="section-title">Contact Information</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="phoneNumber" class="form-label required-field">Phone Number</label>
+                            <input type="tel" class="form-control" id="phoneNumber" th:field="*{phoneNumber}" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="street" class="form-label required-field">Street Address</label>
+                            <input type="text" class="form-control" id="street" th:field="*{street}" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('street')}" th:errors="*{street}"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="city" class="form-label required-field">City</label>
+                            <input type="text" class="form-control" id="city" th:field="*{city}" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="state" class="form-label required-field">State</label>
+                            <input type="text" class="form-control" id="state" th:field="*{state}" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('state')}" th:errors="*{state}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medical Information -->
+                <div class="form-section">
+                    <h3 class="section-title">Medical Information</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="diseases" class="form-label">Diseases</label>
+                            <select class="form-select" id="diseases" th:field="*{diseases}" multiple>
+                                <option th:each="disease : ${T(com.example.model.Diseases.DiseaseType).values()}"
+                                        th:value="${disease}"
+                                        th:text="${disease}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('diseases')}" th:errors="*{diseases}"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="painStrength" class="form-label required-field">Pain Level</label>
+                            <select class="form-select" id="painStrength" th:field="*{painStrength}" required>
+                                <option th:each="strength : ${T(com.example.model.Strength).values()}"
+                                        th:value="${strength}"
+                                        th:text="${strength}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('painStrength')}" th:errors="*{painStrength}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a th:href="@{/}" class="btn btn-secondary me-md-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Register Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ageInput = document.getElementById('age');
+            const dobInput = document.getElementById('dateOfBirth');
+            
+            // Calculate age from date of birth
+            dobInput.addEventListener('change', function() {
+                if (this.value) {
+                    const dob = new Date(this.value);
+                    const today = new Date();
+                    let age = today.getFullYear() - dob.getFullYear();
+                    const monthDiff = today.getMonth() - dob.getMonth();
+                    
+                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                        age--;
+                    }
+                    
+                    ageInput.value = age;
+                }
+            });
+            
+            // Calculate date of birth from age
+            ageInput.addEventListener('change', function() {
+                if (this.value) {
+                    const today = new Date();
+                    const birthYear = today.getFullYear() - parseInt(this.value);
+                    const birthDate = new Date(birthYear, today.getMonth(), today.getDate());
+                    dobInput.value = birthDate.toISOString().split('T')[0];
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

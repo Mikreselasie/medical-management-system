@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${sale.id == null ? 'New Sale' : 'Edit Sale'}">Sale Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .page-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .form-section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #34495e;
+        }
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52,152,219,0.25);
+        }
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        .btn-secondary {
+            background-color: #95a5a6;
+            border-color: #95a5a6;
+        }
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+            border-color: #7f8c8d;
+        }
+        .drug-info-panel {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .drug-info-item {
+            margin-bottom: 0.5rem;
+        }
+        .drug-info-label {
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+        .stock-warning {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+        .required-field::after {
+            content: "*";
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="page-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0" th:text="${sale.id == null ? 'New Sale' : 'Edit Sale'}">Sale Form</h2>
+            <a th:href="@{/sales}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Sales
+            </a>
+        </div>
+
+        <form th:action="${sale.id == null ? '/sales' : '/sales/' + sale.id + '/edit'}" 
+              th:object="${sale}" method="post" class="needs-validation" novalidate>
+            
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-pills me-2"></i>Drug Selection
+                </h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="drugId" class="form-label required-field">Select Drug</label>
+                            <select class="form-select" id="drugId" name="drugId" required
+                                    th:value="${sale.drug != null ? sale.drug.id : ''}"
+                                    onchange="updateDrugInfo(this.value)">
+                                <option value="">Select a drug...</option>
+                                <option th:each="drug : ${drugs}"
+                                        th:value="${drug.id}"
+                                        th:text="${drug.name + ' - $' + drug.price + ' (Stock: ' + drug.quantity + ')'}"
+                                        th:selected="${sale.drug != null && sale.drug.id == drug.id}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">Please select a drug</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="drugInfoPanel" class="drug-info-panel" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="drug-info-item">
+                                <span class="drug-info-label">Price per Unit:</span>
+                                <span id="drugPrice">$0.00</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="drug-info-item">
+                                <span class="drug-info-label">Available Stock:</span>
+                                <span id="drugStock">0</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="drug-info-item">
+                                <span class="drug-info-label">Total Price:</span>
+                                <span id="totalPrice">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="stockWarning" class="stock-warning mt-2" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        Low stock warning
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-shopping-cart me-2"></i>Sale Details
+                </h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label required-field">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" 
+                                   th:field="*{quantity}" required min="1"
+                                   onchange="validateQuantity(this.value)">
+                            <div class="invalid-feedback">Please enter a valid quantity</div>
+                            <div id="quantityError" class="text-danger mt-1" style="display: none;">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span id="quantityErrorMessage"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-user me-2"></i>Customer Information
+                </h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="customerName" class="form-label required-field">Customer Name</label>
+                            <input type="text" class="form-control" id="customerName" 
+                                   th:field="*{customerName}" required>
+                            <div class="invalid-feedback">Please enter customer name</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="customerPhone" class="form-label required-field">Phone Number</label>
+                            <input type="tel" class="form-control" id="customerPhone" 
+                                   th:field="*{customerPhone}" required>
+                            <div class="invalid-feedback">Please enter phone number</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a th:href="@{/sales}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>
+                    <span th:text="${sale.id == null ? 'Create Sale' : 'Update Sale'}">Save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        const drugs = /*[[${drugs}]]*/ [];
+        let currentStock = 0;
+        let currentPrice = 0;
+
+        function updateDrugInfo(drugId) {
+            if (!drugId) {
+                document.getElementById('drugInfoPanel').style.display = 'none';
+                return;
+            }
+
+            // Get drug info from the selected option
+            const select = document.getElementById('drugId');
+            const option = select.options[select.selectedIndex];
+            const stockText = option.text.match(/Stock: (\d+)/);
+            const priceText = option.text.match(/\$(\d+\.?\d*)/);
+            
+            currentStock = stockText ? parseInt(stockText[1]) : 0;
+            currentPrice = priceText ? parseFloat(priceText[1]) : 0;
+
+            // Update drug info panel
+            document.getElementById('drugInfoPanel').style.display = 'block';
+            document.getElementById('drugPrice').textContent = `$${currentPrice.toFixed(2)}`;
+            document.getElementById('drugStock').textContent = currentStock;
+            updateTotalPrice();
+
+            // Show stock warning if stock is low
+            const stockWarning = document.getElementById('stockWarning');
+            if (currentStock <= 5) {
+                stockWarning.style.display = 'block';
+            } else {
+                stockWarning.style.display = 'none';
+            }
+
+            // Validate current quantity
+            const quantityInput = document.getElementById('quantity');
+            if (quantityInput.value) {
+                validateQuantity(quantityInput.value);
+            }
+        }
+
+        function updateTotalPrice() {
+            const quantity = parseInt(document.getElementById('quantity').value) || 0;
+            const totalPrice = quantity * currentPrice;
+            document.getElementById('totalPrice').textContent = `$${totalPrice.toFixed(2)}`;
+        }
+
+        function validateQuantity(value) {
+            const quantity = parseInt(value);
+            const errorDiv = document.getElementById('quantityError');
+            const errorMessage = document.getElementById('quantityErrorMessage');
+            const submitButton = document.querySelector('button[type="submit"]');
+
+            if (isNaN(quantity) || quantity <= 0) {
+                errorMessage.textContent = 'Quantity must be greater than 0';
+                errorDiv.style.display = 'block';
+                submitButton.disabled = true;
+                return false;
+            }
+
+            if (quantity > currentStock) {
+                errorMessage.textContent = `Only ${currentStock} units available in stock`;
+                errorDiv.style.display = 'block';
+                submitButton.disabled = true;
+                return false;
+            }
+
+            errorDiv.style.display = 'none';
+            submitButton.disabled = false;
+            updateTotalPrice();
+            return true;
+        }
+
+        // Form validation
+        (function () {
+            'use strict'
+            const forms = document.querySelectorAll('.needs-validation')
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+
+        // Initialize drug info if editing an existing sale
+        document.addEventListener('DOMContentLoaded', function() {
+            const drugId = document.getElementById('drugId').value;
+            if (drugId) {
+                updateDrugInfo(drugId);
+            }
+        });
+    </script>
+</body>
+</html> 

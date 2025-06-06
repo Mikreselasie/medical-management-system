@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sales Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .page-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+        .page-title {
+            color: #0d6efd;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .report-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .section-title {
+            color: #495057;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .stat-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: 600;
+            color: #0d6efd;
+            margin: 10px 0;
+        }
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .price-value {
+            color: #0d6efd;
+            font-weight: 500;
+        }
+        .btn-action {
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+        .date-range {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="container">
+        <div class="page-container">
+            <h2 class="page-title">
+                <i class="fas fa-chart-line"></i> Sales Report
+            </h2>
+
+            <div class="date-range">
+                <form th:action="@{/sales/report}" method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate" 
+                               th:value="${param.startDate}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate" name="endDate" 
+                               th:value="${param.endDate}">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <i class="fas fa-shopping-cart fa-2x text-primary"></i>
+                        <div class="stat-value" th:text="${sales != null ? #lists.size(sales) : 0}">0</div>
+                        <div class="stat-label">Total Sales</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <i class="fas fa-dollar-sign fa-2x text-success"></i>
+                        <div class="stat-value" th:text="${sales != null ? '$' + #numbers.formatDecimal(#aggregates.sum(sales.![totalPrice]), 1, 2) : '$0.00'}">$0.00</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <i class="fas fa-box fa-2x text-info"></i>
+                        <div class="stat-value" th:text="${sales != null ? #aggregates.sum(sales.![quantity]) : 0}">0</div>
+                        <div class="stat-label">Total Units Sold</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-section">
+                <h3 class="section-title">
+                    <i class="fas fa-list"></i> Sales Details
+                </h3>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Drug</th>
+                                <th>Customer</th>
+                                <th>Quantity</th>
+                                <th>Total Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${sales != null}" th:each="sale : ${sales}">
+                                <td th:text="${#temporals.format(sale.saleDate, 'dd MMM yyyy HH:mm')}">01 Jan 2024</td>
+                                <td th:text="${sale.drug.name}">Drug Name</td>
+                                <td th:text="${sale.customerName}">Customer Name</td>
+                                <td th:text="${sale.quantity + ' units'}">0 units</td>
+                                <td class="price-value" th:text="${'$' + #numbers.formatDecimal(sale.totalPrice, 1, 2)}">$0.00</td>
+                                <td>
+                                    <a th:href="@{/sales/{id}(id=${sale.id})}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${sales == null || #lists.isEmpty(sales)}">
+                                <td colspan="6" class="text-center">No sales found for the selected period.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <a th:href="@{/sales}" class="btn btn-secondary btn-action">
+                    <i class="fas fa-arrow-left"></i> Back to Sales
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
