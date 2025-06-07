@@ -129,6 +129,14 @@
                             <label for="description" class="form-label">Description</label>
                             <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="sideEffects" class="form-label">Side Effects</label>
+                            <textarea class="form-control" id="sideEffects" th:field="*{sideEffects}" rows="3" placeholder="Enter potential side effects"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="strength" class="form-label">Strength</label>
+                            <input type="text" class="form-control" id="strength" th:field="*{strength}" placeholder="e.g., 500mg, 10mg/ml">
+                        </div>
                     </div>
                 </div>
 

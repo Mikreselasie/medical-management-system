@@ -15,6 +15,8 @@ public class Drug {
     private double price;
     private int quantity;
     private String description;
+    private String sideEffects;
+    private String strength;
 
     @ManyToOne
     @JoinColumn(name = "disease_id")
@@ -25,13 +27,16 @@ public class Drug {
 
     // Parameterized constructor
     public Drug(String name, String manufacturer, LocalDate expiryDate, 
-                double price, int quantity, String description, Diseases disease) {
+                double price, int quantity, String description, String sideEffects,
+                String strength, Diseases disease) {
         this.name = name;
         this.manufacturer = manufacturer;
         this.expiryDate = expiryDate;
         this.price = price;
         this.quantity = quantity;
         this.description = description;
+        this.sideEffects = sideEffects;
+        this.strength = strength;
         this.disease = disease;
     }
 
@@ -90,6 +95,22 @@ public class Drug {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getSideEffects() {
+        return sideEffects;
+    }
+
+    public void setSideEffects(String sideEffects) {
+        this.sideEffects = sideEffects;
+    }
+
+    public String getStrength() {
+        return strength;
+    }
+
+    public void setStrength(String strength) {
+        this.strength = strength;
     }
 
     public Diseases getDisease() {
