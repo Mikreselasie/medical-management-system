@@ -137,6 +137,17 @@
                             <label for="strength" class="form-label">Strength</label>
                             <input type="text" class="form-control" id="strength" th:field="*{strength}" placeholder="e.g., 500mg, 10mg/ml">
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="drugCategory" class="form-label required-field">Drug Category</label>
+                            <select class="form-select" id="drugCategory" th:field="*{drugCategory}" required>
+                                <option value="">Select a category</option>
+                                <option th:each="category : ${T(com.example.model.DrugCategory).values()}"
+                                        th:value="${category}"
+                                        th:text="${category.name() + ' - ' + category.description}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">Please select a drug category.</div>
+                        </div>
                     </div>
                 </div>
 

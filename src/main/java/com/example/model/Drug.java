@@ -18,6 +18,9 @@ public class Drug {
     private String sideEffects;
     private String strength;
 
+    @Enumerated(EnumType.STRING)
+    private DrugCategory drugCategory;
+
     @ManyToOne
     @JoinColumn(name = "disease_id")
     private Diseases disease;
@@ -28,7 +31,7 @@ public class Drug {
     // Parameterized constructor
     public Drug(String name, String manufacturer, LocalDate expiryDate, 
                 double price, int quantity, String description, String sideEffects,
-                String strength, Diseases disease) {
+                String strength, DrugCategory drugCategory, Diseases disease) {
         this.name = name;
         this.manufacturer = manufacturer;
         this.expiryDate = expiryDate;
@@ -37,6 +40,7 @@ public class Drug {
         this.description = description;
         this.sideEffects = sideEffects;
         this.strength = strength;
+        this.drugCategory = drugCategory;
         this.disease = disease;
     }
 
@@ -111,6 +115,14 @@ public class Drug {
 
     public void setStrength(String strength) {
         this.strength = strength;
+    }
+
+    public DrugCategory getDrugCategory() {
+        return drugCategory;
+    }
+
+    public void setDrugCategory(DrugCategory drugCategory) {
+        this.drugCategory = drugCategory;
     }
 
     public Diseases getDisease() {
