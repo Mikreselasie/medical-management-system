@@ -3,7 +3,7 @@ services:
     name: drug-management-system
     env: java
     plan: free
-    buildCommand: ./mvnw clean package -DskipTests
+    buildCommand: mvn clean package -DskipTests
     startCommand: java -jar target/spring-web-app-1.0-SNAPSHOT.jar
     envVars:
       - key: JAVA_VERSION
@@ -11,6 +11,6 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: PORT
-        value: 8080
+        value: 8082
     healthCheckPath: /drugs
     autoDeploy: true 
