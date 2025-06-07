@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pharmacist.id == null ? 'Add New Pharmacist' : 'Edit Pharmacist'}">Pharmacist Form</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .page-container {
+            padding: 20px;
+        }
+        .page-title {
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+        .btn-action {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-container">
+            <h2 class="page-title">
+                <i class="fas fa-user-md"></i>
+                <span th:text="${pharmacist.id == null ? 'Add New Pharmacist' : 'Edit Pharmacist'}"></span>
+            </h2>
+            
+            <form th:action="${pharmacist.id == null ? '/pharmacists' : '/pharmacists/' + pharmacist.id}" 
+                  th:object="${pharmacist}" method="post" class="needs-validation" novalidate>
+                
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user"></i> Personal Information
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="firstName" class="form-label required-field">First Name</label>
+                            <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+                            <div class="invalid-feedback">Please enter the first name.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lastName" class="form-label required-field">Last Name</label>
+                            <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+                            <div class="invalid-feedback">Please enter the last name.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label required-field">Email</label>
+                            <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="phoneNumber" class="form-label required-field">Phone Number</label>
+                            <input type="tel" class="form-control" id="phoneNumber" th:field="*{phoneNumber}" required>
+                            <div class="invalid-feedback">Please enter the phone number.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dateOfBirth" class="form-label required-field">Date of Birth</label>
+                            <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}" required>
+                            <div class="invalid-feedback">Please enter the date of birth.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="address" class="form-label required-field">Address</label>
+                            <textarea class="form-control" id="address" th:field="*{address}" rows="2" required></textarea>
+                            <div class="invalid-feedback">Please enter the address.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-mortar-pestle"></i> Professional Information
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="specialization" class="form-label required-field">Specialization</label>
+                            <input type="text" class="form-control" id="specialization" th:field="*{specialization}" 
+                                   placeholder="e.g., Clinical Pharmacy, Hospital Pharmacy" required>
+                            <div class="invalid-feedback">Please enter the specialization.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="licenseNumber" class="form-label required-field">License Number</label>
+                            <input type="text" class="form-control" id="licenseNumber" th:field="*{licenseNumber}" required>
+                            <div class="invalid-feedback">Please enter the license number.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="qualification" class="form-label required-field">Qualification</label>
+                            <input type="text" class="form-control" id="qualification" th:field="*{qualification}" required>
+                            <div class="invalid-feedback">Please enter the qualification.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="experience" class="form-label required-field">Experience</label>
+                            <input type="text" class="form-control" id="experience" th:field="*{experience}" 
+                                   placeholder="e.g., 5 years" required>
+                            <div class="invalid-feedback">Please enter the experience.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a th:href="@{/pharmacists}" class="btn btn-secondary btn-action">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-action">
+                        <i class="fas fa-save"></i> Save Pharmacist
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+</body>
+</html> 
