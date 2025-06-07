@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Doctors List</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .page-container {
+            padding: 20px;
+        }
+        .page-title {
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .doctor-card {
+            margin-bottom: 20px;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .doctor-card .card-header {
+            background-color: #f8f9fa;
+            border-bottom: none;
+        }
+        .doctor-info {
+            color: #6c757d;
+        }
+        .btn-action {
+            margin-left: 5px;
+        }
+        .status-badge {
+            font-size: 0.8em;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="page-title">
+                    <i class="fas fa-user-md"></i> Doctors
+                </h2>
+                <a th:href="@{/doctors/new}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Doctor
+                </a>
+            </div>
+
+            <div class="search-box">
+                <form th:action="@{/doctors}" method="get" class="form-inline">
+                    <div class="input-group w-100">
+                        <input type="text" name="search" class="form-control" 
+                               placeholder="Search by name..." th:value="${param.search}">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6" th:each="doctor : ${doctors}">
+                    <div class="card doctor-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0" th:text="${doctor.fullName}">Doctor Name</h5>
+                            <span th:class="${doctor.active ? 'badge badge-success' : 'badge badge-danger'} status-badge"
+                                  th:text="${doctor.active ? 'Active' : 'Inactive'}">Status</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="doctor-info">
+                                <p><i class="fas fa-stethoscope"></i> <strong>Specialization:</strong> 
+                                   <span th:text="${doctor.specialization}">Specialization</span></p>
+                                <p><i class="fas fa-id-card"></i> <strong>License:</strong> 
+                                   <span th:text="${doctor.licenseNumber}">License Number</span></p>
+                                <p><i class="fas fa-envelope"></i> <strong>Email:</strong> 
+                                   <span th:text="${doctor.email}">Email</span></p>
+                                <p><i class="fas fa-phone"></i> <strong>Phone:</strong> 
+                                   <span th:text="${doctor.phoneNumber}">Phone Number</span></p>
+                            </div>
+                            <div class="mt-3">
+                                <a th:href="@{/doctors/{id}/edit(id=${doctor.id})}" 
+                                   class="btn btn-sm btn-primary btn-action">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a th:href="@{/doctors/{id}/delete(id=${doctor.id})}" 
+                                   class="btn btn-sm btn-danger btn-action"
+                                   onclick="return confirm('Are you sure you want to deactivate this doctor?')">
+                                    <i class="fas fa-trash"></i> Deactivate
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 
