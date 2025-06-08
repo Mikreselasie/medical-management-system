@@ -30,9 +30,21 @@ public class PatientController {
     private DiseasesRepository diseasesRepository;
 
     @GetMapping("/list")
-    public String listPatients(Model model) {
+    public String listPatients(@RequestParam(required = false) String search, Model model) {
         try {
-            List<Patient> patients = patientRepository.findAll();
+            List<Patient> patients;
+            if (search != null && !search.trim().isEmpty()) {
+                // Split the search term into first and last name
+                String[] nameParts = search.trim().split("\\s+", 2);
+                String firstName = nameParts[0];
+                String lastName = nameParts.length > 1 ? nameParts[1] : nameParts[0];
+                
+                patients = patientRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrPatientIdContainingIgnoreCase(
+                    firstName, lastName, search);
+            } else {
+                patients = patientRepository.findAll();
+            }
+
             if (patients == null) {
                 patients = new ArrayList<>();
             }
@@ -53,6 +65,7 @@ public class PatientController {
                 }
             }
             model.addAttribute("patients", patients);
+            model.addAttribute("search", search);
             return "patients/list";
         } catch (Exception e) {
             logger.error("Error fetching patients: ", e);
