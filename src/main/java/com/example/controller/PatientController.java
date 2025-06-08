@@ -78,7 +78,13 @@ public class PatientController {
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         try {
-            model.addAttribute("patient", new Patient());
+            // Create a new patient with default values
+            Patient patient = new Patient();
+            patient.setAddress(new Address());
+            patient.setDiseases(new ArrayList<>());
+            model.addAttribute("patient", patient);
+
+            // Load diseases
             List<Diseases> diseases = diseasesRepository.findAll();
             if (diseases == null || diseases.isEmpty()) {
                 logger.warn("No diseases found in the database. Initializing diseases...");
@@ -96,7 +102,12 @@ public class PatientController {
         } catch (Exception e) {
             logger.error("Error showing create form: ", e);
             model.addAttribute("error", "Error loading form. Please try again later.");
-            return "redirect:/patients/list";
+            // Instead of redirecting, return the form with error
+            model.addAttribute("patient", new Patient());
+            model.addAttribute("diseases", new ArrayList<>());
+            model.addAttribute("genders", Gender.values());
+            model.addAttribute("strengths", Strength.values());
+            return "patients/form";
         }
     }
 
