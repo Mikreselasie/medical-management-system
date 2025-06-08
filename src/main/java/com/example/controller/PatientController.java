@@ -38,6 +38,12 @@ public class PatientController {
                 if (patient.getDiseases() == null) {
                     patient.setDiseases(new ArrayList<>());
                 }
+                // Ensure each disease has a valid diseaseType
+                for (Diseases disease : patient.getDiseases()) {
+                    if (disease.getDiseaseType() == null) {
+                        disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
+                    }
+                }
             }
             model.addAttribute("patients", patients);
             return "patients/list";
@@ -50,20 +56,32 @@ public class PatientController {
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("patient", new Patient());
-        model.addAttribute("diseases", diseasesRepository.findAll());
-        model.addAttribute("genders", Gender.values());
-        model.addAttribute("strengths", Strength.values());
-        return "patients/form";
+        try {
+            model.addAttribute("patient", new Patient());
+            model.addAttribute("diseases", diseasesRepository.findAll());
+            model.addAttribute("genders", Gender.values());
+            model.addAttribute("strengths", Strength.values());
+            return "patients/form";
+        } catch (Exception e) {
+            logger.error("Error showing create form: ", e);
+            model.addAttribute("error", "Error loading form. Please try again later.");
+            return "redirect:/patients/list";
+        }
     }
 
     @PostMapping("/save")
     public String savePatient(@Valid @ModelAttribute Patient patient, BindingResult result, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            model.addAttribute("diseases", diseasesRepository.findAll());
-            model.addAttribute("genders", Gender.values());
-            model.addAttribute("strengths", Strength.values());
-            return "patients/form";
+            try {
+                model.addAttribute("diseases", diseasesRepository.findAll());
+                model.addAttribute("genders", Gender.values());
+                model.addAttribute("strengths", Strength.values());
+                return "patients/form";
+            } catch (Exception e) {
+                logger.error("Error loading form data: ", e);
+                model.addAttribute("error", "Error loading form data. Please try again later.");
+                return "redirect:/patients/list";
+            }
         }
         
         try {
@@ -90,22 +108,25 @@ public class PatientController {
 
             // Handle diseases
             String[] diseaseIds = request.getParameterValues("diseases");
-            if (diseaseIds != null) {
-                List<Diseases> diseases = new ArrayList<>();
+            List<Diseases> diseases = new ArrayList<>();
+            if (diseaseIds != null && diseaseIds.length > 0) {
                 for (String diseaseId : diseaseIds) {
                     try {
                         Long id = Long.parseLong(diseaseId);
                         Optional<Diseases> disease = diseasesRepository.findById(id);
-                        disease.ifPresent(diseases::add);
+                        if (disease.isPresent()) {
+                            Diseases d = disease.get();
+                            if (d.getDiseaseType() == null) {
+                                d.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
+                            }
+                            diseases.add(d);
+                        }
                     } catch (NumberFormatException e) {
-                        // Skip invalid disease IDs
+                        logger.warn("Invalid disease ID: {}", diseaseId);
                     }
                 }
-                patient.setDiseases(diseases);
             }
-
-            // The address is already set in the patient object through Thymeleaf binding
-            // No need to manually create and set the address object
+            patient.setDiseases(diseases);
 
             // Save the patient
             Patient savedPatient = patientRepository.save(patient);
@@ -116,34 +137,61 @@ public class PatientController {
             
             return "redirect:/patients/list";
         } catch (Exception e) {
+            logger.error("Error saving patient: ", e);
             model.addAttribute("error", "Error registering patient: " + e.getMessage());
-            model.addAttribute("diseases", diseasesRepository.findAll());
-            model.addAttribute("genders", Gender.values());
-            model.addAttribute("strengths", Strength.values());
+            try {
+                model.addAttribute("diseases", diseasesRepository.findAll());
+                model.addAttribute("genders", Gender.values());
+                model.addAttribute("strengths", Strength.values());
+            } catch (Exception ex) {
+                logger.error("Error loading form data: ", ex);
+            }
             return "patients/form";
         }
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Optional<Patient> patient = patientRepository.findById(id);
-        if (patient.isPresent()) {
-            model.addAttribute("patient", patient.get());
-            model.addAttribute("diseases", diseasesRepository.findAll());
-            model.addAttribute("genders", Gender.values());
-            model.addAttribute("strengths", Strength.values());
-            return "patients/form";
+        try {
+            Optional<Patient> patient = patientRepository.findById(id);
+            if (patient.isPresent()) {
+                Patient p = patient.get();
+                if (p.getDiseases() == null) {
+                    p.setDiseases(new ArrayList<>());
+                }
+                // Ensure each disease has a valid diseaseType
+                for (Diseases disease : p.getDiseases()) {
+                    if (disease.getDiseaseType() == null) {
+                        disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
+                    }
+                }
+                model.addAttribute("patient", p);
+                model.addAttribute("diseases", diseasesRepository.findAll());
+                model.addAttribute("genders", Gender.values());
+                model.addAttribute("strengths", Strength.values());
+                return "patients/form";
+            }
+            return "redirect:/patients/list";
+        } catch (Exception e) {
+            logger.error("Error showing edit form: ", e);
+            model.addAttribute("error", "Error loading form. Please try again later.");
+            return "redirect:/patients/list";
         }
-        return "redirect:/patients/list";
     }
 
     @PostMapping("/update/{id}")
     public String updatePatient(@PathVariable Long id, @Valid @ModelAttribute Patient patient, BindingResult result, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            model.addAttribute("diseases", diseasesRepository.findAll());
-            model.addAttribute("genders", Gender.values());
-            model.addAttribute("strengths", Strength.values());
-            return "patients/form";
+            try {
+                model.addAttribute("diseases", diseasesRepository.findAll());
+                model.addAttribute("genders", Gender.values());
+                model.addAttribute("strengths", Strength.values());
+                return "patients/form";
+            } catch (Exception e) {
+                logger.error("Error loading form data: ", e);
+                model.addAttribute("error", "Error loading form data. Please try again later.");
+                return "redirect:/patients/list";
+            }
         }
 
         try {
@@ -177,19 +225,25 @@ public class PatientController {
 
                 // Update diseases
                 String[] diseaseIds = request.getParameterValues("diseases");
-                if (diseaseIds != null) {
-                    List<Diseases> diseases = new ArrayList<>();
+                List<Diseases> diseases = new ArrayList<>();
+                if (diseaseIds != null && diseaseIds.length > 0) {
                     for (String diseaseId : diseaseIds) {
                         try {
                             Long diseaseIdLong = Long.parseLong(diseaseId);
                             Optional<Diseases> disease = diseasesRepository.findById(diseaseIdLong);
-                            disease.ifPresent(diseases::add);
+                            if (disease.isPresent()) {
+                                Diseases d = disease.get();
+                                if (d.getDiseaseType() == null) {
+                                    d.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
+                                }
+                                diseases.add(d);
+                            }
                         } catch (NumberFormatException e) {
-                            // Skip invalid disease IDs
+                            logger.warn("Invalid disease ID: {}", diseaseId);
                         }
                     }
-                    updatedPatient.setDiseases(diseases);
                 }
+                updatedPatient.setDiseases(diseases);
 
                 // Update address
                 String street = request.getParameter("address.street");
@@ -218,10 +272,15 @@ public class PatientController {
             }
             return "redirect:/patients/list";
         } catch (Exception e) {
+            logger.error("Error updating patient: ", e);
             model.addAttribute("error", "Error updating patient: " + e.getMessage());
-            model.addAttribute("diseases", diseasesRepository.findAll());
-            model.addAttribute("genders", Gender.values());
-            model.addAttribute("strengths", Strength.values());
+            try {
+                model.addAttribute("diseases", diseasesRepository.findAll());
+                model.addAttribute("genders", Gender.values());
+                model.addAttribute("strengths", Strength.values());
+            } catch (Exception ex) {
+                logger.error("Error loading form data: ", ex);
+            }
             return "patients/form";
         }
     }
@@ -232,6 +291,7 @@ public class PatientController {
             patientRepository.deleteById(id);
             redirectAttributes.addFlashAttribute("success", "Patient deleted successfully");
         } catch (Exception e) {
+            logger.error("Error deleting patient: ", e);
             redirectAttributes.addFlashAttribute("error", "Error deleting patient: " + e.getMessage());
         }
         return "redirect:/patients/list";
@@ -244,11 +304,27 @@ public class PatientController {
 
     @GetMapping("/{id}")
     public String viewPatient(@PathVariable Long id, Model model) {
-        Optional<Patient> patient = patientRepository.findById(id);
-        if (patient.isPresent()) {
-            model.addAttribute("patient", patient.get());
-            return "patients/view";
+        try {
+            Optional<Patient> patient = patientRepository.findById(id);
+            if (patient.isPresent()) {
+                Patient p = patient.get();
+                if (p.getDiseases() == null) {
+                    p.setDiseases(new ArrayList<>());
+                }
+                // Ensure each disease has a valid diseaseType
+                for (Diseases disease : p.getDiseases()) {
+                    if (disease.getDiseaseType() == null) {
+                        disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
+                    }
+                }
+                model.addAttribute("patient", p);
+                return "patients/view";
+            }
+            return "redirect:/patients/list";
+        } catch (Exception e) {
+            logger.error("Error viewing patient: ", e);
+            model.addAttribute("error", "Error loading patient details. Please try again later.");
+            return "redirect:/patients/list";
         }
-        return "redirect:/patients/list";
     }
 } 
