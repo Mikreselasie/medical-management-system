@@ -9,7 +9,8 @@ public class Diseases {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private DiseaseType diseaseType;
+    @Column(nullable = false)
+    private DiseaseType diseaseType = DiseaseType.UNKNOWN; // Default value
 
     public enum DiseaseType {
         DIABETES("Insulin therapy, diet control"),
@@ -50,10 +51,12 @@ public class Diseases {
     }
 
     // No-arg constructor required by JPA
-    public Diseases() {}
+    public Diseases() {
+        this.diseaseType = DiseaseType.UNKNOWN;
+    }
 
     public Diseases(DiseaseType diseaseType) {
-        this.diseaseType = diseaseType;
+        this.diseaseType = diseaseType != null ? diseaseType : DiseaseType.UNKNOWN;
     }
 
     public Long getId() {
@@ -65,15 +68,15 @@ public class Diseases {
     }
 
     public DiseaseType getDiseaseType() {
-        return diseaseType;
+        return diseaseType != null ? diseaseType : DiseaseType.UNKNOWN;
     }
 
     public void setDiseaseType(DiseaseType diseaseType) {
-        this.diseaseType = diseaseType;
+        this.diseaseType = diseaseType != null ? diseaseType : DiseaseType.UNKNOWN;
     }
 
     @Override
     public String toString() {
-        return diseaseType.name();
+        return diseaseType != null ? diseaseType.name() : DiseaseType.UNKNOWN.name();
     }
 } 

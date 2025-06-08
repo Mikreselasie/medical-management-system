@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/patients")
 public class PatientController {
+    private static final Logger logger = LoggerFactory.getLogger(PatientController.class);
 
     @Autowired
     private PatientRepository patientRepository;
@@ -28,9 +31,21 @@ public class PatientController {
 
     @GetMapping("/list")
     public String listPatients(Model model) {
-        List<Patient> patients = patientRepository.findAll();
-        model.addAttribute("patients", patients);
-        return "patients/list";
+        try {
+            List<Patient> patients = patientRepository.findAll();
+            // Initialize empty diseases list for patients with null diseases
+            for (Patient patient : patients) {
+                if (patient.getDiseases() == null) {
+                    patient.setDiseases(new ArrayList<>());
+                }
+            }
+            model.addAttribute("patients", patients);
+            return "patients/list";
+        } catch (Exception e) {
+            logger.error("Error fetching patients: ", e);
+            model.addAttribute("error", "Error loading patients. Please try again later.");
+            return "patients/list";
+        }
     }
 
     @GetMapping("/new")
