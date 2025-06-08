@@ -2,10 +2,12 @@ package com.example.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import com.example.model.Gender;
 
 public class PatientForm {
     private String name;
     private int age;
+    private Gender gender;
     private String street;
     private String city;
     private String state;
@@ -45,4 +47,12 @@ public class PatientForm {
     
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
 } 

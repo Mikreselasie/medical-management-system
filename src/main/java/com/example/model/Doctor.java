@@ -1,6 +1,7 @@
 package com.example.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
 @Entity
@@ -9,17 +10,44 @@ public class Doctor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "First name is required")
+    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
     private String firstName;
+
+    @NotBlank(message = "Last name is required")
+    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
     private String lastName;
+
+    @NotBlank(message = "Specialization is required")
     private String specialization;
+
+    @NotBlank(message = "License number is required")
+    @Pattern(regexp = "^[A-Za-z0-9-]+$", message = "License number can only contain letters, numbers, and hyphens")
     private String licenseNumber;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Please enter a valid email address")
     private String email;
+
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^[0-9+()-\\s]+$", message = "Please enter a valid phone number")
     private String phoneNumber;
+
+    @NotNull(message = "Date of birth is required")
+    @Past(message = "Date of birth must be in the past")
     private LocalDate dateOfBirth;
+
+    @NotBlank(message = "Address is required")
     private String address;
+
     private LocalDate joiningDate;
+
+    @NotBlank(message = "Qualification is required")
     private String qualification;
+
+    @NotBlank(message = "Experience is required")
     private String experience;
+
     private boolean isActive;
 
     // No-arg constructor required by JPA

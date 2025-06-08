@@ -90,6 +90,7 @@ public class HomeController {
         Patient patient = new Patient(
             patientForm.getName(),
             patientForm.getAge(),
+            patientForm.getGender(),
             address,
             patientForm.getIdNumber(),
             dob,

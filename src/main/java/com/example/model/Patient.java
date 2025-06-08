@@ -3,6 +3,7 @@ package com.example.model;
 import java.time.LocalDate;
 import java.util.List;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Patient {
@@ -12,6 +13,10 @@ public class Patient {
 
     private String name;
     private int age;
+
+    @NotNull(message = "Gender is required")
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @Embedded
     private Address address;
@@ -31,10 +36,11 @@ public class Patient {
     public Patient() {}
 
     // Parameterized constructor
-    public Patient(String name, int age, Address address, String idNumber, LocalDate dateOfBirth,
+    public Patient(String name, int age, Gender gender, Address address, String idNumber, LocalDate dateOfBirth,
                    List<Diseases> diseases, String patientId, Strength painStrength, String phoneNumber) {
         this.name = name;
         this.age = age;
+        this.gender = gender;
         this.address = address;
         this.idNumber = idNumber;
         this.dateOfBirth = dateOfBirth;
@@ -132,5 +138,13 @@ public class Patient {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 }

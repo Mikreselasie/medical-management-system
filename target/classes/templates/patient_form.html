@@ -66,10 +66,23 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="dateOfBirth" class="form-label">Date of Birth</label>
-                            <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}">
+                            <label for="gender" class="form-label required-field">Gender</label>
+                            <select class="form-select" id="gender" th:field="*{gender}" required>
+                                <option value="">Select Gender</option>
+                                <option th:each="gender : ${T(com.example.model.Gender).values()}"
+                                        th:value="${gender}"
+                                        th:text="${gender.displayName}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="dateOfBirth" class="form-label required-field">Date of Birth</label>
+                            <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}" required>
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="idNumber" class="form-label">ID Number</label>
                             <input type="text" class="form-control" id="idNumber" th:field="*{idNumber}">

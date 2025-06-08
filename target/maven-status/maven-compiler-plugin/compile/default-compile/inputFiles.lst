@@ -1,25 +1,30 @@
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\DrugCategory.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\controller\PatientForm.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\Patient.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\Strength.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\controller\HomeController.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\repository\PatientRepository.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\DrugSale.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\SideEffect.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\Dosage.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\Pharmacist.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\repository\DiseasesRepository.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\Drug.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\Manufacturer.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\config\DrugDataInitializer.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\repository\DrugRepository.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\Diseases.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\Application.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\controller\DrugController.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\config\DataInitializer.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\Doctor.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\Person.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\repository\DrugSaleRepository.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\model\Address.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\controller\DrugSaleController.java
-C:\Users\Hp\Desktop\Projects\Java Assignment\src\main\java\com\example\controller\PatientController.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\Application.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\config\DrugDataInitializer.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\Person.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\Patient.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\controller\PharmacistController.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\repository\PharmacistRepository.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\Gender.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\Pharmacist.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\controller\HomeController.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\Diseases.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\controller\PatientForm.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\repository\DiseasesRepository.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\Address.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\Drug.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\Dosage.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\DrugCategory.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\Strength.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\Manufacturer.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\repository\PatientRepository.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\controller\DoctorController.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\Doctor.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\repository\DrugRepository.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\DrugSale.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\model\SideEffect.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\controller\DrugController.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\config\DataInitializer.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\repository\DoctorRepository.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\repository\DrugSaleRepository.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\controller\DrugSaleController.java
+C:\Users\Hp\Desktop\Projects\New Version Project\medical-management-system\src\main\java\com\example\controller\PatientController.java

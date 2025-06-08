@@ -7,6 +7,7 @@ import com.example.model.Diseases;
 import com.example.repository.DiseasesRepository;
 
 @Component
+// CommandLineRunner is an interface provided by Spring Boot that allows you to execute code when the application starts up. It's particularly useful for tasks that need to run once during application initialization,
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired

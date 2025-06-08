@@ -27,6 +27,16 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" th:href="@{/doctors}">
+                            <i class="fas fa-user-md"></i> Doctors
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/pharmacists}">
+                            <i class="fas fa-mortar-pestle"></i> Pharmacists
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" th:href="@{/drugs}">
                             <i class="fas fa-pills"></i> Drugs
                         </a>
@@ -41,8 +51,14 @@
                     <a th:href="@{/patient/new}" class="btn btn-light me-2">
                         <i class="fas fa-user-plus"></i> New Patient
                     </a>
-                    <a th:href="@{/drugs/new}" class="btn btn-light">
+                    <a th:href="@{/drugs/new}" class="btn btn-light me-2">
                         <i class="fas fa-plus"></i> New Drug
+                    </a>
+                    <a th:href="@{/doctors/new}" class="btn btn-light me-2">
+                        <i class="fas fa-user-md"></i> New Doctor
+                    </a>
+                    <a th:href="@{/pharmacists/new}" class="btn btn-light">
+                        <i class="fas fa-mortar-pestle"></i> New Pharmacist
                     </a>
                 </div>
             </div>

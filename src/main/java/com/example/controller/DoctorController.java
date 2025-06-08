@@ -3,6 +3,7 @@ package com.example.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import com.example.model.Doctor;
 import com.example.repository.DoctorRepository;
@@ -11,6 +12,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/doctors")
@@ -51,7 +53,12 @@ public class DoctorController {
     }
 
     @PostMapping
-    public String createDoctor(@ModelAttribute Doctor doctor, Model model) {
+    public String createDoctor(@Valid @ModelAttribute Doctor doctor, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            logger.error("Validation errors while creating doctor: {}", bindingResult.getAllErrors());
+            return "doctors/form";
+        }
+
         try {
             doctor.setJoiningDate(LocalDate.now());
             doctor.setActive(true);

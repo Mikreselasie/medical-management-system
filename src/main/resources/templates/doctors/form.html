@@ -51,36 +51,36 @@
                         <div class="col-md-6 mb-3">
                             <label for="firstName" class="form-label required-field">First Name</label>
                             <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
-                            <div class="invalid-feedback">Please enter the first name.</div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="lastName" class="form-label required-field">Last Name</label>
                             <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
-                            <div class="invalid-feedback">Please enter the last name.</div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="email" class="form-label required-field">Email</label>
                             <input type="email" class="form-control" id="email" th:field="*{email}" required>
-                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="phoneNumber" class="form-label required-field">Phone Number</label>
                             <input type="tel" class="form-control" id="phoneNumber" th:field="*{phoneNumber}" required>
-                            <div class="invalid-feedback">Please enter the phone number.</div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="dateOfBirth" class="form-label required-field">Date of Birth</label>
                             <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}" required>
-                            <div class="invalid-feedback">Please enter the date of birth.</div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="address" class="form-label required-field">Address</label>
                             <textarea class="form-control" id="address" th:field="*{address}" rows="2" required></textarea>
-                            <div class="invalid-feedback">Please enter the address.</div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
                         </div>
                     </div>
                 </div>
@@ -93,25 +93,25 @@
                         <div class="col-md-6 mb-3">
                             <label for="specialization" class="form-label required-field">Specialization</label>
                             <input type="text" class="form-control" id="specialization" th:field="*{specialization}" required>
-                            <div class="invalid-feedback">Please enter the specialization.</div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('specialization')}" th:errors="*{specialization}"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="licenseNumber" class="form-label required-field">License Number</label>
                             <input type="text" class="form-control" id="licenseNumber" th:field="*{licenseNumber}" required>
-                            <div class="invalid-feedback">Please enter the license number.</div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('licenseNumber')}" th:errors="*{licenseNumber}"></div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="qualification" class="form-label required-field">Qualification</label>
                             <input type="text" class="form-control" id="qualification" th:field="*{qualification}" required>
-                            <div class="invalid-feedback">Please enter the qualification.</div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('qualification')}" th:errors="*{qualification}"></div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="experience" class="form-label required-field">Experience</label>
                             <input type="text" class="form-control" id="experience" th:field="*{experience}" 
                                    placeholder="e.g., 5 years" required>
-                            <div class="invalid-feedback">Please enter the experience.</div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('experience')}" th:errors="*{experience}"></div>
                         </div>
                     </div>
                 </div>
