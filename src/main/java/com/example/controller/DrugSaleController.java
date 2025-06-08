@@ -1,168 +1,91 @@
 package com.example.controller;
 
+import com.example.model.DrugSale;
+import com.example.model.Drug;
+import com.example.service.DrugSaleService;
+import com.example.service.DrugService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import com.example.model.DrugSale;
-import com.example.model.Drug;
-import com.example.repository.DrugSaleRepository;
-import com.example.repository.DrugRepository;
-import java.time.LocalDateTime;
-import java.time.LocalDate;
-import java.time.LocalTime;
+
+import java.util.List;
 
 @Controller
-@RequestMapping("/sales")
+@RequestMapping("/drug-sales")
 public class DrugSaleController {
 
     @Autowired
-    private DrugSaleRepository drugSaleRepository;
+    private DrugSaleService drugSaleService;
 
     @Autowired
-    private DrugRepository drugRepository;
+    private DrugService drugService;
 
     @GetMapping
     public String listSales(Model model) {
-        model.addAttribute("sales", drugSaleRepository.findAll());
-        return "sales/list";
+        List<DrugSale> sales = drugSaleService.getAllSales();
+        model.addAttribute("sales", sales);
+        return "drug-sales/list";
     }
 
     @GetMapping("/new")
     public String showSaleForm(Model model) {
+        List<Drug> drugs = drugService.getAllDrugs();
+        model.addAttribute("drugs", drugs);
         model.addAttribute("sale", new DrugSale());
-        // Only show drugs that are in stock (quantity > 0)
-        model.addAttribute("drugs", drugRepository.findByQuantityGreaterThan(0));
-        return "sales/form";
+        return "drug-sales/form";
     }
 
     @PostMapping
-    public String createSale(@ModelAttribute DrugSale sale, 
-                           @RequestParam(name = "drugId") Long drugId,
-                           RedirectAttributes redirectAttributes) {
+    public String saveSale(@ModelAttribute DrugSale sale, BindingResult result, RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Please check the form for errors.");
+            return "redirect:/drug-sales/new";
+        }
+
         try {
-            Drug drug = drugRepository.findById(drugId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid drug ID"));
-            
-            // Check if we have enough quantity
-            if (drug.getQuantity() < sale.getQuantity()) {
-                redirectAttributes.addFlashAttribute("error", "Not enough quantity available");
-                return "redirect:/sales/new";
+            if (sale.getBuyerName() == null || sale.getBuyerName().trim().isEmpty()) {
+                throw new RuntimeException("Buyer name is required");
             }
-            
-            // Update drug quantity
-            drug.setQuantity(drug.getQuantity() - sale.getQuantity());
-            drugRepository.save(drug);
-            
-            // Create and save the sale
-            sale.setDrug(drug);
-            sale.setTotalPrice(drug.getPrice() * sale.getQuantity());
-            sale.setSaleDate(LocalDateTime.now());
-            drugSaleRepository.save(sale);
-            
-            redirectAttributes.addFlashAttribute("success", "Sale created successfully");
-            return "redirect:/sales";
+            if (sale.getBuyerPhone() == null || sale.getBuyerPhone().trim().isEmpty()) {
+                throw new RuntimeException("Buyer phone number is required");
+            }
+            if (sale.getDrug() == null) {
+                throw new RuntimeException("Please select a drug");
+            }
+            if (sale.getQuantity() == null || sale.getQuantity() <= 0) {
+                throw new RuntimeException("Please enter a valid quantity");
+            }
+            if (sale.getTotalAmount() == null || sale.getTotalAmount().doubleValue() <= 0) {
+                throw new RuntimeException("Total amount must be greater than 0");
+            }
+
+            drugSaleService.saveSale(sale);
+            redirectAttributes.addFlashAttribute("successMessage", "Drug sale recorded successfully!");
+            return "redirect:/drug-sales";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/sales/new";
+            redirectAttributes.addFlashAttribute("errorMessage", "Error recording drug sale: " + e.getMessage());
+            return "redirect:/drug-sales/new";
         }
     }
 
     @GetMapping("/{id}")
-    public String viewSale(@PathVariable(name = "id") Long id, 
-                          Model model,
-                          RedirectAttributes redirectAttributes) {
-        try {
-            DrugSale sale = drugSaleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Sale not found"));
-            model.addAttribute("sale", sale);
-            return "sales/view";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/sales";
-        }
+    public String viewSale(@PathVariable Long id, Model model) {
+        DrugSale sale = drugSaleService.getSaleById(id);
+        model.addAttribute("sale", sale);
+        return "drug-sales/view";
     }
 
-    @GetMapping("/{id}/edit")
-    public String editSale(@PathVariable(name = "id") Long id, 
-                          Model model,
-                          RedirectAttributes redirectAttributes) {
+    @GetMapping("/{id}/delete")
+    public String deleteSale(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            DrugSale sale = drugSaleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Sale not found"));
-            model.addAttribute("sale", sale);
-            model.addAttribute("drugs", drugRepository.findAll());
-            return "sales/form";
+            drugSaleService.deleteSale(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Drug sale deleted successfully!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/sales";
+            redirectAttributes.addFlashAttribute("errorMessage", "Error deleting drug sale: " + e.getMessage());
         }
-    }
-
-    @PostMapping("/{id}/edit")
-    public String updateSale(@PathVariable(name = "id") Long id, 
-                           @ModelAttribute DrugSale updatedSale,
-                           @RequestParam(name = "drugId") Long drugId,
-                           RedirectAttributes redirectAttributes) {
-        try {
-            DrugSale existingSale = drugSaleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Sale not found"));
-            
-            Drug drug = drugRepository.findById(drugId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid drug ID"));
-            
-            // Calculate quantity difference
-            int quantityDifference = updatedSale.getQuantity() - existingSale.getQuantity();
-            
-            // Check if we have enough quantity for the update
-            if (drug.getQuantity() < quantityDifference) {
-                redirectAttributes.addFlashAttribute("error", "Not enough quantity available");
-                return "redirect:/sales/" + id + "/edit";
-            }
-            
-            // Update drug quantity
-            drug.setQuantity(drug.getQuantity() - quantityDifference);
-            drugRepository.save(drug);
-            
-            // Update sale details
-            existingSale.setDrug(drug);
-            existingSale.setQuantity(updatedSale.getQuantity());
-            existingSale.setTotalPrice(drug.getPrice() * updatedSale.getQuantity());
-            existingSale.setCustomerName(updatedSale.getCustomerName());
-            existingSale.setCustomerPhone(updatedSale.getCustomerPhone());
-            
-            drugSaleRepository.save(existingSale);
-            
-            redirectAttributes.addFlashAttribute("success", "Sale updated successfully");
-            return "redirect:/sales";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/sales/" + id + "/edit";
-        }
-    }
-
-    @GetMapping("/report")
-    public String showReport(Model model, 
-                           @RequestParam(required = false) String startDate,
-                           @RequestParam(required = false) String endDate) {
-        
-        LocalDateTime startDateTime;
-        LocalDateTime endDateTime;
-        
-        if (startDate != null && !startDate.isEmpty()) {
-            startDateTime = LocalDate.parse(startDate).atStartOfDay();
-        } else {
-            startDateTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
-        }
-        
-        if (endDate != null && !endDate.isEmpty()) {
-            endDateTime = LocalDate.parse(endDate).atTime(LocalTime.MAX);
-        } else {
-            endDateTime = LocalDateTime.now().with(LocalTime.MAX);
-        }
-        
-        model.addAttribute("sales", drugSaleRepository.findBySaleDateBetween(startDateTime, endDateTime));
-        return "sales/report";
+        return "redirect:/drug-sales";
     }
 } 

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Patient Details</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/common.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Include the navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">Patient Details</h3>
+                        <div>
+                            <a th:href="@{/patients/edit/{id}(id=${patient.id})}" class="btn btn-primary me-2">
+                                <i class="fas fa-edit me-2"></i>Edit
+                            </a>
+                            <a th:href="@{/patients/list}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to List
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5 class="text-muted mb-3">Personal Information</h5>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <th class="text-muted">Patient ID:</th>
+                                        <td th:text="${patient.patientId}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">Name:</th>
+                                        <td th:text="${patient.firstName + ' ' + patient.lastName}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">Age:</th>
+                                        <td th:text="${patient.age}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">Gender:</th>
+                                        <td th:text="${patient.gender}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">Date of Birth:</th>
+                                        <td th:text="${#temporals.format(patient.dateOfBirth, 'dd/MM/yyyy')}"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-muted mb-3">Contact Information</h5>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <th class="text-muted">Phone:</th>
+                                        <td th:text="${patient.phoneNumber}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">Email:</th>
+                                        <td th:text="${patient.email}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">Address:</th>
+                                        <td>
+                                            <span th:text="${patient.address.street}"></span><br>
+                                            <span th:text="${patient.address.city + ', ' + patient.address.state}"></span>
+                                            <span th:if="${patient.address.zipCode != null && !patient.address.zipCode.isEmpty()}" 
+                                                  th:text="${', ' + patient.address.zipCode}"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="text-muted mb-3">Medical Information</h5>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <th class="text-muted">Pain Strength:</th>
+                                        <td th:text="${patient.painStrength}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted">Diseases:</th>
+                                        <td>
+                                            <span th:if="${patient.diseases != null && !patient.diseases.isEmpty()}"
+                                                  th:each="disease, iterStat : ${patient.diseases}"
+                                                  th:text="${disease.diseaseType + (iterStat.last ? '' : ', ')}">
+                                            </span>
+                                            <span th:unless="${patient.diseases != null && !patient.diseases.isEmpty()}">None</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

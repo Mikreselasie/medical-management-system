@@ -2,65 +2,52 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Navigation Bar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navbar</title>
 </head>
 <body>
-    <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav th:fragment="navbar" class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" th:href="@{/}">
-                <i class="fas fa-hospital"></i> Medical Management
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-hospital me-2"></i>
+                Medical Management System
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/}">
-                            <i class="fas fa-home"></i> Home
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i> Home
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/patients}">
-                            <i class="fas fa-users"></i> Patients
+                        <a class="nav-link" href="/patients">
+                            <i class="fas fa-user-injured me-1"></i> Patients
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/doctors}">
-                            <i class="fas fa-user-md"></i> Doctors
+                        <a class="nav-link" href="/doctors">
+                            <i class="fas fa-user-md me-1"></i> Doctors
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/pharmacists}">
-                            <i class="fas fa-mortar-pestle"></i> Pharmacists
+                        <a class="nav-link" href="/pharmacists">
+                            <i class="fas fa-user-nurse me-1"></i> Pharmacists
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/drugs}">
-                            <i class="fas fa-pills"></i> Drugs
+                        <a class="nav-link" href="/drugs">
+                            <i class="fas fa-pills me-1"></i> Drugs
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/sales}">
-                            <i class="fas fa-shopping-cart"></i> Sales
+                        <a class="nav-link" href="/drug-sales">
+                            <i class="fas fa-shopping-cart me-1"></i> Drug Sales
                         </a>
                     </li>
                 </ul>
-                <div class="d-flex">
-                    <a th:href="@{/patient/new}" class="btn btn-light me-2">
-                        <i class="fas fa-user-plus"></i> New Patient
-                    </a>
-                    <a th:href="@{/drugs/new}" class="btn btn-light me-2">
-                        <i class="fas fa-plus"></i> New Drug
-                    </a>
-                    <a th:href="@{/doctors/new}" class="btn btn-light me-2">
-                        <i class="fas fa-user-md"></i> New Doctor
-                    </a>
-                    <a th:href="@{/pharmacists/new}" class="btn btn-light">
-                        <i class="fas fa-mortar-pestle"></i> New Pharmacist
-                    </a>
-                </div>
             </div>
         </div>
     </nav>

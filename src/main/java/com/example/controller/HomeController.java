@@ -15,9 +15,12 @@ import com.example.repository.PatientRepository;
 import com.example.repository.DiseasesRepository;
 import com.example.repository.DrugRepository;
 import com.example.repository.DrugSaleRepository;
+import com.example.repository.DoctorRepository;
+import com.example.repository.PharmacistRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class HomeController {
@@ -34,77 +37,32 @@ public class HomeController {
     @Autowired
     private DrugSaleRepository drugSaleRepository;
 
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
+    private PharmacistRepository pharmacistRepository;
+
     @GetMapping("/")
-    public String home(Model model) {
-        // Add statistics to the model
+    public String home(@RequestParam(required = false) String search, Model model) {
+        List<Patient> patients;
+        if (search != null && !search.trim().isEmpty()) {
+            // Split the search term into first and last name
+            String[] nameParts = search.trim().split("\\s+", 2);
+            String firstName = nameParts[0];
+            String lastName = nameParts.length > 1 ? nameParts[1] : nameParts[0];
+            
+            patients = patientRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrPatientIdContainingIgnoreCase(
+                firstName, lastName, search);
+        } else {
+            patients = patientRepository.findAll();
+        }
+        model.addAttribute("patients", patients);
+        model.addAttribute("search", search);
         model.addAttribute("totalPatients", patientRepository.count());
-        model.addAttribute("totalDrugs", drugRepository.count());
-        model.addAttribute("totalSales", drugSaleRepository.count());
-        return "home";
-    }
-
-    @GetMapping("/patient/new")
-    public String showPatientForm(Model model) {
-        model.addAttribute("patientForm", new PatientForm());
-        return "patient_form";
-    }
-
-    @PostMapping("/patient/new")
-    public String createPatient(@ModelAttribute PatientForm patientForm, Model model) {
-        // Convert form data to Patient object
-        Address address = new Address(
-            patientForm.getStreet(),
-            patientForm.getCity(),
-            patientForm.getState()
-        );
-        address.setPhoneNumber(patientForm.getPhoneNumber());
-
-        List<Diseases> diseases = new ArrayList<>();
-        if (patientForm.getDiseases() != null) {
-            for (String diseaseType : patientForm.getDiseases()) {
-                try {
-                    Diseases disease = new Diseases(DiseaseType.valueOf(diseaseType.trim().toUpperCase()));
-                    disease = diseasesRepository.save(disease); // Save each disease first
-                    diseases.add(disease);
-                } catch (Exception e) {
-                    // Handle invalid disease type
-                    Diseases disease = new Diseases(DiseaseType.UNKNOWN);
-                    disease = diseasesRepository.save(disease);
-                    diseases.add(disease);
-                }
-            }
-        }
-
-        Strength painStrength;
-        try {
-            painStrength = Strength.valueOf(patientForm.getPainStrength().trim().toUpperCase());
-        } catch (Exception e) {
-            painStrength = Strength.MEDIUM;
-        }
-
-        LocalDate dob = patientForm.getDateOfBirth();
-        if (dob == null) {
-            dob = LocalDate.now().minusYears(patientForm.getAge());
-        }
-
-        Patient patient = new Patient(
-            patientForm.getName(),
-            patientForm.getAge(),
-            patientForm.getGender(),
-            address,
-            patientForm.getIdNumber(),
-            dob,
-            diseases,
-            "P" + System.currentTimeMillis(),
-            painStrength,
-            patientForm.getPhoneNumber()
-        );
-        
-        // Save the patient to the database
-        patient = patientRepository.save(patient);
-        
-        model.addAttribute("patient", patient);
-        return "patient_success";
+        model.addAttribute("totalDoctors", doctorRepository.count());
+        model.addAttribute("totalPharmacists", pharmacistRepository.count());
+        return "index";
     }
 
     @PostMapping("/create")

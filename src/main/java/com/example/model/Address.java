@@ -1,20 +1,36 @@
 package com.example.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Embeddable
 public class Address {
+    @NotBlank(message = "Street is required")
+    @Size(min = 2, max = 100, message = "Street must be between 2 and 100 characters")
     private String street;
+
+    @NotBlank(message = "City is required")
+    @Size(min = 2, max = 50, message = "City must be between 2 and 50 characters")
     private String city;
+
+    @NotBlank(message = "State is required")
+    @Size(min = 2, max = 50, message = "State must be between 2 and 50 characters")
     private String state;
+
+    @Size(max = 20, message = "Zip code must be less than 20 characters")
     private String zipCode;
+
     private String country;
-    private String phoneNumber;
-    private String email;
     private String faxNumber;
     private String website;
 
-    public Address() {}
+    public Address() {
+        this.street = "";
+        this.city = "";
+        this.state = "";
+        this.zipCode = "";
+    }
 
     public Address(String street, String city, String state, String zipCode, String country) {
         this.street = street;
@@ -22,8 +38,6 @@ public class Address {
         this.state = state;
         this.zipCode = zipCode;
         this.country = country;
-        this.phoneNumber = "";
-        this.email = "";
         this.faxNumber = "";
         this.website = "";
     }
@@ -34,8 +48,6 @@ public class Address {
         this.state = state;
         this.zipCode = "";
         this.country = "Ethiopia";
-        this.phoneNumber = "";
-        this.email = "";
         this.faxNumber = "";
         this.website = "";
     }
@@ -51,10 +63,6 @@ public class Address {
     public void setZipCode(String zipCode) { this.zipCode = zipCode; }
     public String getCountry() { return country; }
     public void setCountry(String country) { this.country = country; }
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
     public String getFaxNumber() { return faxNumber; }
     public void setFaxNumber(String faxNumber) { this.faxNumber = faxNumber; }
     public String getWebsite() { return website; }
@@ -62,6 +70,6 @@ public class Address {
 
     @Override
     public String toString() {
-        return street + ", " + city + ", " + state + ", " + country;
+        return street + ", " + city + ", " + state + (zipCode != null && !zipCode.isEmpty() ? " " + zipCode : "");
     }
 } 

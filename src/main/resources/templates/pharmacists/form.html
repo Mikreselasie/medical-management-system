@@ -1,137 +1,172 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${pharmacist.id == null ? 'Add New Pharmacist' : 'Edit Pharmacist'}">Pharmacist Form</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        .page-container {
-            padding: 20px;
-        }
-        .page-title {
-            margin-bottom: 30px;
-            color: #2c3e50;
-        }
-        .form-section {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .section-title {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.2em;
-        }
-        .required-field::after {
-            content: " *";
-            color: red;
-        }
-        .btn-action {
-            margin-left: 5px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pharmacist.id == null ? 'Add New Pharmacist' : 'Edit Pharmacist'}"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/common.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="page-container">
-            <h2 class="page-title">
-                <i class="fas fa-user-md"></i>
-                <span th:text="${pharmacist.id == null ? 'Add New Pharmacist' : 'Edit Pharmacist'}"></span>
-            </h2>
-            
-            <form th:action="${pharmacist.id == null ? '/pharmacists' : '/pharmacists/' + pharmacist.id}" 
-                  th:object="${pharmacist}" method="post" class="needs-validation" novalidate>
-                
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-user"></i> Personal Information
-                    </h3>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="firstName" class="form-label required-field">First Name</label>
-                            <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
-                            <div class="invalid-feedback">Please enter the first name.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="lastName" class="form-label required-field">Last Name</label>
-                            <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
-                            <div class="invalid-feedback">Please enter the last name.</div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label required-field">Email</label>
-                            <input type="email" class="form-control" id="email" th:field="*{email}" required>
-                            <div class="invalid-feedback">Please enter a valid email address.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="phoneNumber" class="form-label required-field">Phone Number</label>
-                            <input type="tel" class="form-control" id="phoneNumber" th:field="*{phoneNumber}" required>
-                            <div class="invalid-feedback">Please enter the phone number.</div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="dateOfBirth" class="form-label required-field">Date of Birth</label>
-                            <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}" required>
-                            <div class="invalid-feedback">Please enter the date of birth.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="address" class="form-label required-field">Address</label>
-                            <textarea class="form-control" id="address" th:field="*{address}" rows="2" required></textarea>
-                            <div class="invalid-feedback">Please enter the address.</div>
-                        </div>
-                    </div>
-                </div>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-mortar-pestle"></i> Professional Information
-                    </h3>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="specialization" class="form-label required-field">Specialization</label>
-                            <input type="text" class="form-control" id="specialization" th:field="*{specialization}" 
-                                   placeholder="e.g., Clinical Pharmacy, Hospital Pharmacy" required>
-                            <div class="invalid-feedback">Please enter the specialization.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="licenseNumber" class="form-label required-field">License Number</label>
-                            <input type="text" class="form-control" id="licenseNumber" th:field="*{licenseNumber}" required>
-                            <div class="invalid-feedback">Please enter the license number.</div>
-                        </div>
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-user-md me-2"></i>
+                            <span th:text="${pharmacist.id == null ? 'Add New Pharmacist' : 'Edit Pharmacist'}"></span>
+                        </h3>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="qualification" class="form-label required-field">Qualification</label>
-                            <input type="text" class="form-control" id="qualification" th:field="*{qualification}" required>
-                            <div class="invalid-feedback">Please enter the qualification.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="experience" class="form-label required-field">Experience</label>
-                            <input type="text" class="form-control" id="experience" th:field="*{experience}" 
-                                   placeholder="e.g., 5 years" required>
-                            <div class="invalid-feedback">Please enter the experience.</div>
-                        </div>
-                    </div>
-                </div>
+                    <div class="card-body">
+                        <form th:action="${pharmacist.id == null ? '/pharmacists' : '/pharmacists/' + pharmacist.id}" 
+                              th:object="${pharmacist}" method="post" class="needs-validation" novalidate>
+                            
+                            <!-- Personal Information -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-user me-2"></i>Personal Information
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="firstName" class="form-label required-field">First Name</label>
+                                            <input type="text" class="form-control" id="firstName" th:field="*{firstName}" 
+                                                   th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid'" required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="lastName" class="form-label required-field">Last Name</label>
+                                            <input type="text" class="form-control" id="lastName" th:field="*{lastName}" 
+                                                   th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid'" required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="email" class="form-label required-field">Email</label>
+                                            <input type="email" class="form-control" id="email" th:field="*{email}" 
+                                                   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="phoneNumber" class="form-label required-field">Phone Number</label>
+                                            <input type="tel" class="form-control" id="phoneNumber" th:field="*{phoneNumber}" 
+                                                   th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'" required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="age" class="form-label required-field">Age</label>
+                                            <input type="number" class="form-control" id="age" th:field="*{age}" 
+                                                   min="18" max="100" th:classappend="${#fields.hasErrors('age')} ? 'is-invalid'" required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="gender" class="form-label required-field">Gender</label>
+                                            <select class="form-select" id="gender" th:field="*{gender}" 
+                                                    th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid'" required>
+                                                <option value="">Select Gender</option>
+                                                <option th:each="gender : ${T(com.example.model.Gender).values()}"
+                                                        th:value="${gender}"
+                                                        th:text="${gender}"></option>
+                                            </select>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                <div class="d-flex justify-content-end gap-2">
-                    <a th:href="@{/pharmacists}" class="btn btn-secondary btn-action">
-                        <i class="fas fa-times"></i> Cancel
-                    </a>
-                    <button type="submit" class="btn btn-primary btn-action">
-                        <i class="fas fa-save"></i> Save Pharmacist
-                    </button>
+                            <!-- Address Information -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-map-marker-alt me-2"></i>Address Information
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="street" class="form-label required-field">Street</label>
+                                            <input type="text" class="form-control" id="street" name="street" 
+                                                   th:value="${pharmacist.address != null ? pharmacist.address.street : ''}" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="city" class="form-label required-field">City</label>
+                                            <input type="text" class="form-control" id="city" name="city" 
+                                                   th:value="${pharmacist.address != null ? pharmacist.address.city : ''}" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="state" class="form-label required-field">State</label>
+                                            <input type="text" class="form-control" id="state" name="state" 
+                                                   th:value="${pharmacist.address != null ? pharmacist.address.state : ''}" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="zipCode" class="form-label required-field">ZIP Code</label>
+                                            <input type="text" class="form-control" id="zipCode" name="zipCode" 
+                                                   th:value="${pharmacist.address != null ? pharmacist.address.zipCode : ''}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Professional Information -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-pills me-2"></i>Professional Information
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="licenseNumber" class="form-label required-field">License Number</label>
+                                            <input type="text" class="form-control" id="licenseNumber" th:field="*{licenseNumber}" 
+                                                   th:classappend="${#fields.hasErrors('licenseNumber')} ? 'is-invalid'" required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('licenseNumber')}" th:errors="*{licenseNumber}"></div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="qualification" class="form-label required-field">Qualification</label>
+                                            <input type="text" class="form-control" id="qualification" th:field="*{qualification}" 
+                                                   th:classappend="${#fields.hasErrors('qualification')} ? 'is-invalid'" required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('qualification')}" th:errors="*{qualification}"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="experience" class="form-label required-field">Experience (years)</label>
+                                            <input type="number" class="form-control" id="experience" th:field="*{experience}" 
+                                                   min="0" max="50" th:classappend="${#fields.hasErrors('experience')} ? 'is-invalid'" required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('experience')}" th:errors="*{experience}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a th:href="@{/pharmacists}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Save Pharmacist
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Form validation
         (function() {

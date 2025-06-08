@@ -1,124 +1,52 @@
 package com.example.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
-public class Pharmacist {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String firstName;
-    private String lastName;
+@Table(name = "pharmacists")
+public class Pharmacist extends Person {
+    @NotBlank(message = "License number is required")
+    @Size(min = 5, max = 20, message = "License number must be between 5 and 20 characters")
+    @Column(name = "license_number", unique = true)
     private String licenseNumber;
-    private String email;
-    private String phoneNumber;
-    private LocalDate dateOfBirth;
-    private String address;
-    private LocalDate joiningDate;
+
+    @NotBlank(message = "Qualification is required")
+    @Size(min = 2, max = 100, message = "Qualification must be between 2 and 100 characters")
     private String qualification;
-    private String experience;
-    private String specialization; // e.g., Clinical Pharmacy, Hospital Pharmacy
-    private boolean isActive;
 
-    // No-arg constructor required by JPA
-    public Pharmacist() {}
+    @NotNull(message = "Experience is required")
+    @Min(value = 0, message = "Experience must be greater than or equal to 0")
+    @Max(value = 60, message = "Experience must be less than or equal to 60")
+    private int experience;
 
-    // Parameterized constructor
-    public Pharmacist(String firstName, String lastName, String licenseNumber, 
-                     String email, String phoneNumber, LocalDate dateOfBirth, 
-                     String address, LocalDate joiningDate, String qualification, 
-                     String experience, String specialization) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    @Column(name = "joining_date")
+    private LocalDate joiningDate;
+
+    @Column(name = "is_active")
+    private boolean isActive = true;
+
+    // Default constructor
+    public Pharmacist() {
+        super();
+    }
+
+    public Pharmacist(String firstName, String lastName, int age, Gender gender, Address address, String licenseNumber, String qualification, int experience, LocalDate joiningDate, String phoneNumber) {
+        super(firstName, lastName, age, gender, address, phoneNumber);
         this.licenseNumber = licenseNumber;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.dateOfBirth = dateOfBirth;
-        this.address = address;
-        this.joiningDate = joiningDate;
         this.qualification = qualification;
         this.experience = experience;
-        this.specialization = specialization;
-        this.isActive = true;
+        this.joiningDate = joiningDate;
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getFullName() {
-        return firstName + " " + lastName;
-    }
-
     public String getLicenseNumber() {
         return licenseNumber;
     }
 
     public void setLicenseNumber(String licenseNumber) {
         this.licenseNumber = licenseNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public LocalDate getJoiningDate() {
-        return joiningDate;
-    }
-
-    public void setJoiningDate(LocalDate joiningDate) {
-        this.joiningDate = joiningDate;
     }
 
     public String getQualification() {
@@ -129,20 +57,20 @@ public class Pharmacist {
         this.qualification = qualification;
     }
 
-    public String getExperience() {
+    public int getExperience() {
         return experience;
     }
 
-    public void setExperience(String experience) {
+    public void setExperience(int experience) {
         this.experience = experience;
     }
 
-    public String getSpecialization() {
-        return specialization;
+    public LocalDate getJoiningDate() {
+        return joiningDate;
     }
 
-    public void setSpecialization(String specialization) {
-        this.specialization = specialization;
+    public void setJoiningDate(LocalDate joiningDate) {
+        this.joiningDate = joiningDate;
     }
 
     public boolean isActive() {
@@ -151,5 +79,23 @@ public class Pharmacist {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    @Override
+    public String toString() {
+        return "Pharmacist{" +
+                "id=" + getId() +
+                ", firstName='" + getFirstName() + '\'' +
+                ", lastName='" + getLastName() + '\'' +
+                ", age=" + getAge() +
+                ", gender=" + getGender() +
+                ", address='" + getAddress() + '\'' +
+                ", phoneNumber='" + getPhoneNumber() + '\'' +
+                ", licenseNumber='" + licenseNumber + '\'' +
+                ", qualification='" + qualification + '\'' +
+                ", experience=" + experience +
+                ", joiningDate=" + joiningDate +
+                ", isActive=" + isActive +
+                '}';
     }
 } 

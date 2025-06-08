@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import jakarta.validation.Valid;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/doctors")
@@ -53,25 +54,39 @@ public class DoctorController {
     }
 
     @PostMapping
-    public String createDoctor(@Valid @ModelAttribute Doctor doctor, BindingResult bindingResult, Model model) {
+    public String createDoctor(@Valid @ModelAttribute Doctor doctor, 
+                             BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes,
+                             Model model) {
         if (bindingResult.hasErrors()) {
-            logger.error("Validation errors while creating doctor: {}", bindingResult.getAllErrors());
+            logger.warn("Validation errors while creating doctor: {}", bindingResult.getAllErrors());
             return "doctors/form";
         }
 
         try {
+            // Calculate date of birth from age
+            if (doctor.getAge() > 0) {
+                LocalDate today = LocalDate.now();
+                LocalDate dateOfBirth = today.minusYears(doctor.getAge());
+                doctor.setDateOfBirth(dateOfBirth);
+            }
+            
+            // Set joining date to current date
             doctor.setJoiningDate(LocalDate.now());
+            // Ensure doctor is active
             doctor.setActive(true);
+            
             doctorRepository.save(doctor);
+            redirectAttributes.addFlashAttribute("success", "Doctor created successfully!");
             return "redirect:/doctors";
         } catch (DataAccessException e) {
             logger.error("Database error while creating doctor: ", e);
-            model.addAttribute("error", "Unable to create doctor. Please try again later.");
-            return "error";
+            model.addAttribute("error", "Error saving doctor. Please try again.");
+            return "doctors/form";
         } catch (Exception e) {
             logger.error("Unexpected error while creating doctor: ", e);
-            model.addAttribute("error", "An unexpected error occurred. Please try again later.");
-            return "error";
+            model.addAttribute("error", "An unexpected error occurred. Please try again.");
+            return "doctors/form";
         }
     }
 
@@ -99,7 +114,13 @@ public class DoctorController {
     }
 
     @PostMapping("/{id}")
-    public String updateDoctor(@PathVariable(name = "id") Long id, @ModelAttribute Doctor doctor, Model model) {
+    public String updateDoctor(@PathVariable(name = "id") Long id, @Valid @ModelAttribute Doctor doctor, 
+                             BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            logger.error("Validation errors while updating doctor: {}", bindingResult.getAllErrors());
+            return "doctors/form";
+        }
+
         try {
             doctor.setId(id);
             doctorRepository.save(doctor);

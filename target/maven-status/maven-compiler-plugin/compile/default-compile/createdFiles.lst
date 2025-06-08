@@ -2,7 +2,9 @@ com\example\model\Doctor.class
 com\example\Application.class
 com\example\config\DrugDataInitializer.class
 com\example\controller\DrugSaleController.class
+com\example\controller\DoctorController.class
 com\example\controller\PatientController.class
+com\example\controller\PharmacistController.class
 com\example\controller\DrugController.class
 com\example\model\Diseases$DiseaseType.class
 com\example\controller\PatientForm.class
@@ -16,10 +18,13 @@ com\example\controller\HomeController.class
 com\example\model\Pharmacist.class
 com\example\model\DrugSale.class
 com\example\model\Manufacturer.class
+com\example\repository\PharmacistRepository.class
+com\example\repository\DoctorRepository.class
 com\example\model\SideEffect.class
 com\example\model\Person.class
 com\example\model\DrugCategory.class
 com\example\repository\DiseasesRepository.class
+com\example\model\Gender.class
 com\example\model\Dosage.class
 com\example\repository\DrugSaleRepository.class
 com\example\config\DataInitializer.class

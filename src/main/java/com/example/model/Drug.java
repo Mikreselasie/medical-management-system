@@ -1,25 +1,43 @@
 package com.example.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "drugs")
 public class Drug {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
-    private String manufacturer;
-    private LocalDate expiryDate;
-    private double price;
-    private int quantity;
-    private String description;
-    private String sideEffects;
-    private String strength;
 
+    @Column(nullable = false)
+    private String manufacturer;
+
+    @Column(nullable = false)
+    private BigDecimal price;
+
+    @Column(nullable = false)
+    private Integer quantity;
+
+    @Column(name = "expiry_date")
+    private LocalDate expiryDate;
+
+    @Column(name = "drug_category")
     @Enumerated(EnumType.STRING)
     private DrugCategory drugCategory;
+
+    @Column(name = "side_effects")
+    private String sideEffects;
+
+    @Column
+    private String strength;
+
+    @Column
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "disease_id")
@@ -35,7 +53,7 @@ public class Drug {
         this.name = name;
         this.manufacturer = manufacturer;
         this.expiryDate = expiryDate;
-        this.price = price;
+        this.price = BigDecimal.valueOf(price);
         this.quantity = quantity;
         this.description = description;
         this.sideEffects = sideEffects;
@@ -69,6 +87,22 @@ public class Drug {
         this.manufacturer = manufacturer;
     }
 
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
     public LocalDate getExpiryDate() {
         return expiryDate;
     }
@@ -77,28 +111,12 @@ public class Drug {
         this.expiryDate = expiryDate;
     }
 
-    public double getPrice() {
-        return price;
+    public DrugCategory getDrugCategory() {
+        return drugCategory;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDrugCategory(DrugCategory drugCategory) {
+        this.drugCategory = drugCategory;
     }
 
     public String getSideEffects() {
@@ -117,12 +135,12 @@ public class Drug {
         this.strength = strength;
     }
 
-    public DrugCategory getDrugCategory() {
-        return drugCategory;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDrugCategory(DrugCategory drugCategory) {
-        this.drugCategory = drugCategory;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Diseases getDisease() {

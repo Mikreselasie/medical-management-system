@@ -1,22 +1,20 @@
 package com.example.controller;
 
+import com.example.model.*;
+import com.example.repository.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import com.example.model.Patient;
-import com.example.model.Address;
-import com.example.model.Diseases;
-import com.example.model.Diseases.DiseaseType;
-import com.example.model.Strength;
-import com.example.repository.PatientRepository;
-import com.example.repository.DrugRepository;
-import com.example.repository.DrugSaleRepository;
-import com.example.repository.DiseasesRepository;
 
-import java.util.List;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/patients")
@@ -26,142 +24,216 @@ public class PatientController {
     private PatientRepository patientRepository;
 
     @Autowired
-    private DrugRepository drugRepository;
-
-    @Autowired
-    private DrugSaleRepository drugSaleRepository;
-
-    @Autowired
     private DiseasesRepository diseasesRepository;
 
-    @GetMapping
-    public String listPatients(@RequestParam(required = false, name = "search") String search, Model model) {
-        List<Patient> patients;
-        if (search != null && !search.trim().isEmpty()) {
-            patients = patientRepository.findByNameContainingIgnoreCaseOrPatientIdContainingIgnoreCase(search, search);
-        } else {
-            patients = patientRepository.findAll();
-        }
+    @GetMapping("/list")
+    public String listPatients(Model model) {
+        List<Patient> patients = patientRepository.findAll();
         model.addAttribute("patients", patients);
         return "patients/list";
     }
 
-    @GetMapping("/{id}")
-    public String viewPatient(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-        try {
-            Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found"));
-            model.addAttribute("patient", patient);
-            return "patients/view";
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", "Patient not found");
-            return "redirect:/patients";
-        }
+    @GetMapping("/new")
+    public String showCreateForm(Model model) {
+        model.addAttribute("patient", new Patient());
+        model.addAttribute("diseases", diseasesRepository.findAll());
+        model.addAttribute("genders", Gender.values());
+        model.addAttribute("strengths", Strength.values());
+        return "patients/form";
     }
 
-    @GetMapping("/{id}/edit")
-    public String editPatient(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-        try {
-            Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found"));
-            
-            PatientForm patientForm = new PatientForm();
-            patientForm.setName(patient.getName());
-            patientForm.setAge(patient.getAge());
-            patientForm.setIdNumber(patient.getIdNumber());
-            patientForm.setDateOfBirth(patient.getDateOfBirth());
-            patientForm.setPainStrength(patient.getPainStrength() != null ? patient.getPainStrength().name() : null);
-            
-            if (patient.getAddress() != null) {
-                patientForm.setStreet(patient.getAddress().getStreet());
-                patientForm.setCity(patient.getAddress().getCity());
-                patientForm.setState(patient.getAddress().getState());
-                patientForm.setPhoneNumber(patient.getAddress().getPhoneNumber());
-            }
-            
-            if (patient.getDiseases() != null) {
-                String[] diseaseTypes = patient.getDiseases().stream()
-                    .map(d -> d.getDiseaseType().name())
-                    .toArray(String[]::new);
-                patientForm.setDiseases(diseaseTypes);
-            }
-            
-            model.addAttribute("patient", patient);
-            model.addAttribute("patientForm", patientForm);
-            return "patients/edit";
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", "Patient not found");
-            return "redirect:/patients";
+    @PostMapping("/save")
+    public String savePatient(@Valid @ModelAttribute Patient patient, BindingResult result, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            model.addAttribute("diseases", diseasesRepository.findAll());
+            model.addAttribute("genders", Gender.values());
+            model.addAttribute("strengths", Strength.values());
+            return "patients/form";
         }
-    }
-
-    @PostMapping("/{id}")
-    public String updatePatient(@PathVariable("id") Long id, @ModelAttribute PatientForm form, RedirectAttributes redirectAttributes) {
+        
         try {
-            Patient existingPatient = patientRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found"));
+            // Generate a unique patient ID
+            String patientId = "P" + String.format("%03d", patientRepository.count() + 1);
+            patient.setPatientId(patientId);
 
-            // Update basic information
-            existingPatient.setName(form.getName());
-            existingPatient.setAge(form.getAge());
-            existingPatient.setIdNumber(form.getIdNumber());
-            existingPatient.setDateOfBirth(form.getDateOfBirth());
-
-            // Update address
-            if (existingPatient.getAddress() == null) {
-                existingPatient.setAddress(new Address());
-            }
-            existingPatient.getAddress().setStreet(form.getStreet());
-            existingPatient.getAddress().setCity(form.getCity());
-            existingPatient.getAddress().setState(form.getState());
-            existingPatient.getAddress().setPhoneNumber(form.getPhoneNumber());
-
-            // Update pain strength
-            if (form.getPainStrength() != null && !form.getPainStrength().isEmpty()) {
+            // Convert pain strength from string to enum
+            String painStrengthStr = request.getParameter("painStrength");
+            if (painStrengthStr != null && !painStrengthStr.isEmpty()) {
                 try {
-                    existingPatient.setPainStrength(Strength.valueOf(form.getPainStrength().toUpperCase()));
+                    Strength painStrength = Strength.valueOf(painStrengthStr);
+                    patient.setPainStrength(painStrength);
                 } catch (IllegalArgumentException e) {
-                    existingPatient.setPainStrength(Strength.MEDIUM);
+                    patient.setPainStrength(Strength.MEDIUM); // Default value
                 }
             }
 
-            // Update diseases
-            List<Diseases> diseases = new ArrayList<>();
-            if (form.getDiseases() != null) {
-                for (String diseaseType : form.getDiseases()) {
+            // Calculate date of birth from age
+            int age = patient.getAge();
+            LocalDate currentDate = LocalDate.now();
+            LocalDate dateOfBirth = currentDate.minusYears(age);
+            patient.setDateOfBirth(dateOfBirth);
+
+            // Handle diseases
+            String[] diseaseIds = request.getParameterValues("diseases");
+            if (diseaseIds != null) {
+                List<Diseases> diseases = new ArrayList<>();
+                for (String diseaseId : diseaseIds) {
                     try {
-                        Diseases disease = new Diseases(DiseaseType.valueOf(diseaseType.trim().toUpperCase()));
-                        disease = diseasesRepository.save(disease);
-                        diseases.add(disease);
-                    } catch (Exception e) {
-                        Diseases disease = new Diseases(DiseaseType.UNKNOWN);
-                        disease = diseasesRepository.save(disease);
-                        diseases.add(disease);
+                        Long id = Long.parseLong(diseaseId);
+                        Optional<Diseases> disease = diseasesRepository.findById(id);
+                        disease.ifPresent(diseases::add);
+                    } catch (NumberFormatException e) {
+                        // Skip invalid disease IDs
                     }
                 }
+                patient.setDiseases(diseases);
             }
-            existingPatient.setDiseases(diseases);
 
-            patientRepository.save(existingPatient);
-            redirectAttributes.addFlashAttribute("success", "Patient updated successfully");
-            return "redirect:/patients";
-        } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", "Patient not found");
-            return "redirect:/patients";
+            // The address is already set in the patient object through Thymeleaf binding
+            // No need to manually create and set the address object
+
+            // Save the patient
+            Patient savedPatient = patientRepository.save(patient);
+            
+            // Add success message and patient data to flash attributes
+            redirectAttributes.addFlashAttribute("success", "Patient registered successfully");
+            redirectAttributes.addFlashAttribute("patient", savedPatient);
+            
+            return "redirect:/patients/list";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error registering patient: " + e.getMessage());
+            model.addAttribute("diseases", diseasesRepository.findAll());
+            model.addAttribute("genders", Gender.values());
+            model.addAttribute("strengths", Strength.values());
+            return "patients/form";
         }
     }
 
-    @GetMapping("/{id}/delete")
-    public String deletePatient(@PathVariable("id") Long id) {
-        patientRepository.deleteById(id);
-        return "redirect:/patients";
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Long id, Model model) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isPresent()) {
+            model.addAttribute("patient", patient.get());
+            model.addAttribute("diseases", diseasesRepository.findAll());
+            model.addAttribute("genders", Gender.values());
+            model.addAttribute("strengths", Strength.values());
+            return "patients/form";
+        }
+        return "redirect:/patients/list";
     }
 
-    // Add this method to handle the home page statistics
-    @ModelAttribute
-    public void addAttributes(Model model) {
-        model.addAttribute("totalPatients", patientRepository.count());
-        model.addAttribute("totalDrugs", drugRepository.count());
-        model.addAttribute("totalSales", drugSaleRepository.count());
+    @PostMapping("/update/{id}")
+    public String updatePatient(@PathVariable Long id, @Valid @ModelAttribute Patient patient, BindingResult result, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            model.addAttribute("diseases", diseasesRepository.findAll());
+            model.addAttribute("genders", Gender.values());
+            model.addAttribute("strengths", Strength.values());
+            return "patients/form";
+        }
+
+        try {
+            Optional<Patient> existingPatient = patientRepository.findById(id);
+            if (existingPatient.isPresent()) {
+                Patient updatedPatient = existingPatient.get();
+                
+                // Update basic information
+                updatedPatient.setFirstName(patient.getFirstName());
+                updatedPatient.setLastName(patient.getLastName());
+                updatedPatient.setAge(patient.getAge());
+                updatedPatient.setGender(patient.getGender());
+                updatedPatient.setPhoneNumber(patient.getPhoneNumber());
+                updatedPatient.setEmail(patient.getEmail());
+
+                // Update pain strength
+                String painStrengthStr = request.getParameter("painStrength");
+                if (painStrengthStr != null && !painStrengthStr.isEmpty()) {
+                    try {
+                        Strength painStrength = Strength.valueOf(painStrengthStr);
+                        updatedPatient.setPainStrength(painStrength);
+                    } catch (IllegalArgumentException e) {
+                        updatedPatient.setPainStrength(Strength.MEDIUM);
+                    }
+                }
+
+                // Update date of birth
+                LocalDate currentDate = LocalDate.now();
+                LocalDate dateOfBirth = currentDate.minusYears(patient.getAge());
+                updatedPatient.setDateOfBirth(dateOfBirth);
+
+                // Update diseases
+                String[] diseaseIds = request.getParameterValues("diseases");
+                if (diseaseIds != null) {
+                    List<Diseases> diseases = new ArrayList<>();
+                    for (String diseaseId : diseaseIds) {
+                        try {
+                            Long diseaseIdLong = Long.parseLong(diseaseId);
+                            Optional<Diseases> disease = diseasesRepository.findById(diseaseIdLong);
+                            disease.ifPresent(diseases::add);
+                        } catch (NumberFormatException e) {
+                            // Skip invalid disease IDs
+                        }
+                    }
+                    updatedPatient.setDiseases(diseases);
+                }
+
+                // Update address
+                String street = request.getParameter("address.street");
+                String city = request.getParameter("address.city");
+                String state = request.getParameter("address.state");
+                String zipCode = request.getParameter("address.zipCode");
+                
+                if (street != null && city != null && state != null) {
+                    Address address = new Address();
+                    address.setStreet(street);
+                    address.setCity(city);
+                    address.setState(state);
+                    if (zipCode != null && !zipCode.trim().isEmpty()) {
+                        address.setZipCode(zipCode);
+                    }
+                    updatedPatient.setAddress(address);
+                }
+
+                // Save the updated patient
+                Patient savedPatient = patientRepository.save(updatedPatient);
+                
+                redirectAttributes.addFlashAttribute("success", "Patient updated successfully");
+                redirectAttributes.addFlashAttribute("patient", savedPatient);
+                
+                return "redirect:/patients/list";
+            }
+            return "redirect:/patients/list";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error updating patient: " + e.getMessage());
+            model.addAttribute("diseases", diseasesRepository.findAll());
+            model.addAttribute("genders", Gender.values());
+            model.addAttribute("strengths", Strength.values());
+            return "patients/form";
+        }
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deletePatient(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            patientRepository.deleteById(id);
+            redirectAttributes.addFlashAttribute("success", "Patient deleted successfully");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error deleting patient: " + e.getMessage());
+        }
+        return "redirect:/patients/list";
+    }
+
+    @GetMapping
+    public String redirectToList() {
+        return "redirect:/patients/list";
+    }
+
+    @GetMapping("/{id}")
+    public String viewPatient(@PathVariable Long id, Model model) {
+        Optional<Patient> patient = patientRepository.findById(id);
+        if (patient.isPresent()) {
+            model.addAttribute("patient", patient.get());
+            return "patients/view";
+        }
+        return "redirect:/patients/list";
     }
 } 

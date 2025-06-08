@@ -9,6 +9,7 @@ import com.example.repository.DrugRepository;
 import com.example.repository.DiseasesRepository;
 import java.util.Optional;
 import com.example.model.DrugCategory;
+import java.math.BigDecimal;
 
 @Component
 public class DrugDataInitializer implements CommandLineRunner {
@@ -32,7 +33,7 @@ public class DrugDataInitializer implements CommandLineRunner {
             insulin.setName("Insulin Regular");
             insulin.setManufacturer("Novo Nordisk");
             insulin.setQuantity(100);
-            insulin.setPrice(25.99);
+            insulin.setPrice(new BigDecimal("25.99"));
             insulin.setDisease(diabetes.orElse(null));
             insulin.setSideEffects("Hypoglycemia, weight gain, injection site reactions");
             insulin.setStrength("100 units/ml");
@@ -42,7 +43,7 @@ public class DrugDataInitializer implements CommandLineRunner {
             metformin.setName("Metformin 500mg");
             metformin.setManufacturer("Merck");
             metformin.setQuantity(200);
-            metformin.setPrice(15.99);
+            metformin.setPrice(new BigDecimal("15.99"));
             metformin.setDisease(diabetes.orElse(null));
             metformin.setSideEffects("Nausea, diarrhea, vitamin B12 deficiency");
             metformin.setStrength("500mg");
@@ -52,7 +53,7 @@ public class DrugDataInitializer implements CommandLineRunner {
             lisinopril.setName("Lisinopril 10mg");
             lisinopril.setManufacturer("AstraZeneca");
             lisinopril.setQuantity(150);
-            lisinopril.setPrice(12.99);
+            lisinopril.setPrice(new BigDecimal("12.99"));
             lisinopril.setDisease(hypertension.orElse(null));
             lisinopril.setSideEffects("Dry cough, dizziness, high potassium levels");
             lisinopril.setStrength("10mg");
@@ -62,7 +63,7 @@ public class DrugDataInitializer implements CommandLineRunner {
             amlodipine.setName("Amlodipine 5mg");
             amlodipine.setManufacturer("Pfizer");
             amlodipine.setQuantity(180);
-            amlodipine.setPrice(18.99);
+            amlodipine.setPrice(new BigDecimal("18.99"));
             amlodipine.setDisease(hypertension.orElse(null));
             amlodipine.setSideEffects("Swelling in ankles, dizziness, flushing");
             amlodipine.setStrength("5mg");

@@ -1,35 +1,38 @@
 package com.example.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "drug_sales")
 public class DrugSale {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "buyer_name", nullable = false)
+    private String buyerName;
+
+    @Column(name = "buyer_phone", nullable = false)
+    private String buyerPhone;
+
     @ManyToOne
-    @JoinColumn(name = "drug_id")
+    @JoinColumn(name = "drug_id", nullable = false)
     private Drug drug;
 
-    private int quantity;
-    private double totalPrice;
+    @Column(nullable = false)
+    private Integer quantity;
+
+    @Column(name = "total_amount", nullable = false)
+    private BigDecimal totalAmount;
+
+    @Column(name = "sale_date", nullable = false)
     private LocalDateTime saleDate;
-    private String customerName;
-    private String customerPhone;
 
-    // No-arg constructor required by JPA
-    public DrugSale() {}
-
-    // Parameterized constructor
-    public DrugSale(Drug drug, int quantity, String customerName, String customerPhone) {
-        this.drug = drug;
-        this.quantity = quantity;
-        this.totalPrice = drug.getPrice() * quantity;
+    // Default constructor
+    public DrugSale() {
         this.saleDate = LocalDateTime.now();
-        this.customerName = customerName;
-        this.customerPhone = customerPhone;
     }
 
     // Getters and Setters
@@ -41,6 +44,22 @@ public class DrugSale {
         this.id = id;
     }
 
+    public String getBuyerName() {
+        return buyerName;
+    }
+
+    public void setBuyerName(String buyerName) {
+        this.buyerName = buyerName;
+    }
+
+    public String getBuyerPhone() {
+        return buyerPhone;
+    }
+
+    public void setBuyerPhone(String buyerPhone) {
+        this.buyerPhone = buyerPhone;
+    }
+
     public Drug getDrug() {
         return drug;
     }
@@ -49,23 +68,20 @@ public class DrugSale {
         this.drug = drug;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
-        if (this.drug != null) {
-            this.totalPrice = this.drug.getPrice() * quantity;
-        }
     }
 
-    public double getTotalPrice() {
-        return totalPrice;
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public LocalDateTime getSaleDate() {
@@ -74,21 +90,5 @@ public class DrugSale {
 
     public void setSaleDate(LocalDateTime saleDate) {
         this.saleDate = saleDate;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
-    public String getCustomerPhone() {
-        return customerPhone;
-    }
-
-    public void setCustomerPhone(String customerPhone) {
-        this.customerPhone = customerPhone;
     }
 } 

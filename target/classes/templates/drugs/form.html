@@ -2,8 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Drug Form</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/common.css" rel="stylesheet">
     <style>
         .page-container {
             background-color: #f8f9fa;
@@ -52,118 +55,140 @@
     </style>
 </head>
 <body>
-    <div th:replace="fragments/navbar :: navbar"></div>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-    <div class="container">
-        <div class="page-container">
-            <h2 class="page-title">
-                <i class="fas fa-pills"></i>
-                <span th:text="${drug.id == null ? 'Add New Drug' : 'Edit Drug'}"></span>
-            </h2>
-            
-            <form th:action="${drug.id == null ? '/drugs' : '/drugs/' + drug.id}" 
-                  th:object="${drug}" method="post" class="needs-validation" novalidate>
-                
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-info-circle"></i> Basic Information
-                    </h3>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label required-field">Drug Name</label>
-                            <input type="text" class="form-control" id="name" th:field="*{name}" required>
-                            <div class="invalid-feedback">Please enter the drug name.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="manufacturer" class="form-label required-field">Manufacturer</label>
-                            <input type="text" class="form-control" id="manufacturer" th:field="*{manufacturer}" required>
-                            <div class="invalid-feedback">Please enter the manufacturer.</div>
-                        </div>
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-pills me-2"></i>
+                            <span th:text="${drug.id == null ? 'Add New Drug' : 'Edit Drug'}"></span>
+                        </h3>
                     </div>
-                </div>
-
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-tags"></i> Inventory Details
-                    </h3>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="price" class="form-label required-field">Price</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" required>
+                    <div class="card-body">
+                        <form th:action="${drug.id == null ? '/drugs' : '/drugs/' + drug.id}" 
+                              th:object="${drug}" method="post" class="needs-validation" novalidate>
+                            
+                            <!-- Basic Information -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>Basic Information
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="name" class="form-label required-field">Drug Name</label>
+                                            <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                                            <div class="invalid-feedback">Please enter the drug name.</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="manufacturer" class="form-label required-field">Manufacturer</label>
+                                            <input type="text" class="form-control" id="manufacturer" th:field="*{manufacturer}" required>
+                                            <div class="invalid-feedback">Please enter the manufacturer.</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="invalid-feedback">Please enter the price.</div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="quantity" class="form-label required-field">Quantity</label>
-                            <input type="number" class="form-control" id="quantity" th:field="*{quantity}" required>
-                            <div class="invalid-feedback">Please enter the quantity.</div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="expiryDate" class="form-label required-field">Expiry Date</label>
-                            <input type="date" class="form-control" id="expiryDate" th:field="*{expiryDate}" required>
-                            <div class="invalid-feedback">Please enter the expiry date.</div>
-                        </div>
+
+                            <!-- Inventory Details -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-tags me-2"></i>Inventory Details
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="price" class="form-label required-field">Price</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" required>
+                                            </div>
+                                            <div class="invalid-feedback">Please enter the price.</div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="quantity" class="form-label required-field">Quantity</label>
+                                            <input type="number" class="form-control" id="quantity" th:field="*{quantity}" required>
+                                            <div class="invalid-feedback">Please enter the quantity.</div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="expiryDate" class="form-label required-field">Expiry Date</label>
+                                            <input type="date" class="form-control" id="expiryDate" th:field="*{expiryDate}" required>
+                                            <div class="invalid-feedback">Please enter the expiry date.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Information -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-notes-medical me-2"></i>Additional Information
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="diseaseId" class="form-label required-field">Disease</label>
+                                            <select class="form-select" id="diseaseId" name="diseaseId" required>
+                                                <option value="">Select a disease</option>
+                                                <option th:each="disease : ${diseases}"
+                                                        th:value="${disease.id}"
+                                                        th:text="${disease.diseaseType.name() + ' - ' + disease.diseaseType.treatment}"
+                                                        th:selected="${drug.disease != null && drug.disease.id == disease.id}">
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback">Please select a disease.</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="drugCategory" class="form-label required-field">Drug Category</label>
+                                            <select class="form-select" id="drugCategory" th:field="*{drugCategory}" required>
+                                                <option value="">Select a category</option>
+                                                <option th:each="category : ${T(com.example.model.DrugCategory).values()}"
+                                                        th:value="${category}"
+                                                        th:text="${category.name() + ' - ' + category.description}">
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback">Please select a drug category.</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="strength" class="form-label">Strength</label>
+                                            <input type="text" class="form-control" id="strength" th:field="*{strength}" placeholder="e.g., 500mg, 10mg/ml">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="description" class="form-label">Description</label>
+                                            <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label for="sideEffects" class="form-label">Side Effects</label>
+                                            <textarea class="form-control" id="sideEffects" th:field="*{sideEffects}" rows="3" placeholder="Enter potential side effects"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a th:href="@{/drugs}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Save Drug
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
-                <div class="form-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-notes-medical"></i> Additional Information
-                    </h3>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="diseaseId" class="form-label required-field">Disease</label>
-                            <select class="form-select" id="diseaseId" name="diseaseId" required>
-                                <option value="">Select a disease</option>
-                                <option th:each="disease : ${diseases}"
-                                        th:value="${disease.id}"
-                                        th:text="${disease.diseaseType.name() + ' - ' + disease.diseaseType.treatment}"
-                                        th:selected="${drug.disease != null && drug.disease.id == disease.id}">
-                                </option>
-                            </select>
-                            <div class="invalid-feedback">Please select a disease.</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="sideEffects" class="form-label">Side Effects</label>
-                            <textarea class="form-control" id="sideEffects" th:field="*{sideEffects}" rows="3" placeholder="Enter potential side effects"></textarea>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="strength" class="form-label">Strength</label>
-                            <input type="text" class="form-control" id="strength" th:field="*{strength}" placeholder="e.g., 500mg, 10mg/ml">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="drugCategory" class="form-label required-field">Drug Category</label>
-                            <select class="form-select" id="drugCategory" th:field="*{drugCategory}" required>
-                                <option value="">Select a category</option>
-                                <option th:each="category : ${T(com.example.model.DrugCategory).values()}"
-                                        th:value="${category}"
-                                        th:text="${category.name() + ' - ' + category.description}">
-                                </option>
-                            </select>
-                            <div class="invalid-feedback">Please select a drug category.</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-end gap-2">
-                    <a th:href="@{/drugs}" class="btn btn-secondary btn-action">
-                        <i class="fas fa-times"></i> Cancel
-                    </a>
-                    <button type="submit" class="btn btn-primary btn-action">
-                        <i class="fas fa-save"></i> Save Drug
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Form validation
         (function () {
