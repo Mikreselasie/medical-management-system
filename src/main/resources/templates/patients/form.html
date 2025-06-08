@@ -141,7 +141,8 @@
                                     <select class="form-select" id="diseases" th:field="*{diseases}" multiple>
                                         <option th:each="disease : ${diseases}"
                                                 th:value="${disease.id}"
-                                                th:text="${disease.diseaseType}">
+                                                th:text="${disease.diseaseType.name() + ' - ' + disease.diseaseType.treatment}"
+                                                th:selected="${patient.diseases != null && patient.diseases.contains(disease)}">
                                         </option>
                                     </select>
                                     <div class="form-text">Hold Ctrl (or Cmd on Mac) to select multiple diseases</div>

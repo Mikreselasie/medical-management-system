@@ -106,20 +106,15 @@ public class PatientController {
         } catch (Exception e) {
             logger.error("Error showing create form: ", e);
             model.addAttribute("error", "Error loading form. Please try again later.");
-            // Instead of redirecting, return the form with error
-            model.addAttribute("patient", new Patient());
-            model.addAttribute("diseases", new ArrayList<>());
-            model.addAttribute("genders", Gender.values());
-            model.addAttribute("strengths", Strength.values());
-            return "patients/form";
+            return "redirect:/patients/list";
         }
     }
 
     @PostMapping("/save")
-    public String savePatient(@Valid @ModelAttribute("patient") Patient patient, 
-                            BindingResult result, 
-                            Model model,
-                            RedirectAttributes redirectAttributes) {
+    public String savePatient(@Valid @ModelAttribute Patient patient,
+                             BindingResult result,
+                             Model model,
+                             RedirectAttributes redirectAttributes) {
         try {
             if (result.hasErrors()) {
                 model.addAttribute("diseases", diseasesRepository.findAll());

@@ -65,10 +65,27 @@ public class DrugController {
     @GetMapping("/new")
     public String showDrugForm(Model model) {
         try {
-            model.addAttribute("drug", new Drug()); // Empty drug object for form binding
-            model.addAttribute("diseases", diseasesRepository.findAll()); // List diseases for selection
+            Drug drug = new Drug();
+            model.addAttribute("drug", drug);
+            
+            // Load diseases and sort them by type
+            List<Diseases> diseases = diseasesRepository.findAll();
+            if (diseases == null || diseases.isEmpty()) {
+                logger.warn("No diseases found in the database. Initializing diseases...");
+                // Initialize diseases if none exist
+                for (Diseases.DiseaseType type : Diseases.DiseaseType.values()) {
+                    Diseases disease = new Diseases(type);
+                    diseasesRepository.save(disease);
+                }
+                diseases = diseasesRepository.findAll();
+            }
+            
+            // Sort diseases by type name
+            diseases.sort((d1, d2) -> d1.getDiseaseType().name().compareTo(d2.getDiseaseType().name()));
+            
+            model.addAttribute("diseases", diseases);
             model.addAttribute("drugCategories", DrugCategory.values());
-            return "drugs/form"; // Return form view
+            return "drugs/form";
         } catch (Exception e) {
             logger.error("Error showing drug form: ", e);
             return "redirect:/drugs?error=Error loading form";
@@ -142,13 +159,12 @@ public class DrugController {
     // 5. UPDATE EXISTING DRUG
     // ================================
     @PostMapping("/{id}")
-    public String updateDrug(@PathVariable(name = "id") Long id, 
+    public String updateDrug(@PathVariable Long id,
                            @Valid @ModelAttribute Drug drug,
                            BindingResult bindingResult,
                            @RequestParam(name = "diseaseId") Long diseaseId,
                            Model model,
                            RedirectAttributes redirectAttributes) {
-        
         try {
             if (bindingResult.hasErrors()) {
                 model.addAttribute("diseases", diseasesRepository.findAll());
@@ -156,24 +172,29 @@ public class DrugController {
                 return "drugs/form";
             }
 
+            Drug existingDrug = drugRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid drug ID"));
+
+            // Update drug properties
+            existingDrug.setName(drug.getName());
+            existingDrug.setManufacturer(drug.getManufacturer());
+            existingDrug.setPrice(drug.getPrice());
+            existingDrug.setQuantity(drug.getQuantity());
+            existingDrug.setExpiryDate(drug.getExpiryDate());
+            existingDrug.setDrugCategory(drug.getDrugCategory());
+            existingDrug.setStrength(drug.getStrength());
+            existingDrug.setDescription(drug.getDescription());
+            existingDrug.setSideEffects(drug.getSideEffects());
+
+            // Update disease
             Diseases disease = diseasesRepository.findById(diseaseId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid disease ID"));
-            
-            drug.setId(id); // Set the existing ID (important for updating)
-            drug.setDisease(disease); // Set selected disease
-            
-            // Validate drug category
-            if (drug.getDrugCategory() == null) {
-                bindingResult.rejectValue("drugCategory", "error.drug", "Drug category is required");
-                model.addAttribute("diseases", diseasesRepository.findAll());
-                model.addAttribute("drugCategories", DrugCategory.values());
-                return "drugs/form";
-            }
+            existingDrug.setDisease(disease);
 
-            drugRepository.save(drug); // Save updated drug
+            drugRepository.save(existingDrug);
             
             redirectAttributes.addFlashAttribute("successMessage", "Drug updated successfully!");
-            return "redirect:/drugs"; // Redirect to list
+            return "redirect:/drugs";
         } catch (Exception e) {
             logger.error("Error updating drug: ", e);
             model.addAttribute("errorMessage", "Error updating drug: " + e.getMessage());
@@ -187,9 +208,9 @@ public class DrugController {
     // 6. DELETE DRUG
     // ================================
     @GetMapping("/{id}/delete")
-    public String deleteDrug(@PathVariable(name = "id") Long id, RedirectAttributes redirectAttributes) {
+    public String deleteDrug(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            drugRepository.deleteById(id); // Delete by ID
+            drugRepository.deleteById(id);
             redirectAttributes.addFlashAttribute("successMessage", "Drug deleted successfully!");
         } catch (Exception e) {
             logger.error("Error deleting drug: ", e);
