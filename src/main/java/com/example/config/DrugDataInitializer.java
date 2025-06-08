@@ -7,7 +7,7 @@ import com.example.model.Drug;
 import com.example.model.Diseases;
 import com.example.repository.DrugRepository;
 import com.example.repository.DiseasesRepository;
-import java.util.Optional;
+import java.util.List;
 import com.example.model.DrugCategory;
 import java.math.BigDecimal;
 
@@ -25,8 +25,12 @@ public class DrugDataInitializer implements CommandLineRunner {
         // Only initialize if the drug repository is empty
         if (drugRepository.count() == 0) {
             // Get diseases from database
-            Optional<Diseases> diabetes = diseasesRepository.findByDiseaseType(Diseases.DiseaseType.DIABETES);
-            Optional<Diseases> hypertension = diseasesRepository.findByDiseaseType(Diseases.DiseaseType.HYPERTENSION);
+            List<Diseases> diabetesList = diseasesRepository.findByDiseaseType(Diseases.DiseaseType.DIABETES);
+            List<Diseases> hypertensionList = diseasesRepository.findByDiseaseType(Diseases.DiseaseType.HYPERTENSION);
+            
+            // Get the first disease from each list, or null if empty
+            Diseases diabetes = diabetesList.isEmpty() ? null : diabetesList.get(0);
+            Diseases hypertension = hypertensionList.isEmpty() ? null : hypertensionList.get(0);
 
             // Create sample drugs
             Drug insulin = new Drug();
@@ -34,7 +38,7 @@ public class DrugDataInitializer implements CommandLineRunner {
             insulin.setManufacturer("Novo Nordisk");
             insulin.setQuantity(100);
             insulin.setPrice(new BigDecimal("25.99"));
-            insulin.setDisease(diabetes.orElse(null));
+            insulin.setDisease(diabetes);
             insulin.setSideEffects("Hypoglycemia, weight gain, injection site reactions");
             insulin.setStrength("100 units/ml");
             insulin.setDrugCategory(DrugCategory.HORMONE);
@@ -44,7 +48,7 @@ public class DrugDataInitializer implements CommandLineRunner {
             metformin.setManufacturer("Merck");
             metformin.setQuantity(200);
             metformin.setPrice(new BigDecimal("15.99"));
-            metformin.setDisease(diabetes.orElse(null));
+            metformin.setDisease(diabetes);
             metformin.setSideEffects("Nausea, diarrhea, vitamin B12 deficiency");
             metformin.setStrength("500mg");
             metformin.setDrugCategory(DrugCategory.ANTIDIABETIC);
@@ -54,7 +58,7 @@ public class DrugDataInitializer implements CommandLineRunner {
             lisinopril.setManufacturer("AstraZeneca");
             lisinopril.setQuantity(150);
             lisinopril.setPrice(new BigDecimal("12.99"));
-            lisinopril.setDisease(hypertension.orElse(null));
+            lisinopril.setDisease(hypertension);
             lisinopril.setSideEffects("Dry cough, dizziness, high potassium levels");
             lisinopril.setStrength("10mg");
             lisinopril.setDrugCategory(DrugCategory.ANTIHYPERTENSIVE);
@@ -64,7 +68,7 @@ public class DrugDataInitializer implements CommandLineRunner {
             amlodipine.setManufacturer("Pfizer");
             amlodipine.setQuantity(180);
             amlodipine.setPrice(new BigDecimal("18.99"));
-            amlodipine.setDisease(hypertension.orElse(null));
+            amlodipine.setDisease(hypertension);
             amlodipine.setSideEffects("Swelling in ankles, dizziness, flushing");
             amlodipine.setStrength("5mg");
             amlodipine.setDrugCategory(DrugCategory.ANTIHYPERTENSIVE);
