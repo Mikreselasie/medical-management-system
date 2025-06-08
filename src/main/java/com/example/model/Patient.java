@@ -2,6 +2,7 @@ package com.example.model;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -10,17 +11,23 @@ import jakarta.validation.constraints.NotNull;
 public class Patient extends Person {
     private String idNumber;
 
-    @ManyToMany
-    private List<Diseases> diseases;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "patient_diseases",
+        joinColumns = @JoinColumn(name = "patient_id"),
+        inverseJoinColumns = @JoinColumn(name = "disease_id")
+    )
+    private List<Diseases> diseases = new ArrayList<>();
 
     private String patientId;
 
     @Enumerated(EnumType.STRING)
-    private Strength painStrength;
+    private Strength painStrength = Strength.MEDIUM; // Default value
 
     // Default constructor
     public Patient() {
         super();
+        this.diseases = new ArrayList<>();
     }
 
     // Parameterized constructor
@@ -30,9 +37,9 @@ public class Patient extends Person {
         super(firstName, lastName, age, gender, address, phoneNumber);
         this.idNumber = idNumber;
         setDateOfBirth(dateOfBirth);
-        this.diseases = diseases;
+        this.diseases = diseases != null ? diseases : new ArrayList<>();
         this.patientId = patientId;
-        this.painStrength = painStrength;
+        this.painStrength = painStrength != null ? painStrength : Strength.MEDIUM;
     }
 
     // Getters and Setters
@@ -45,11 +52,11 @@ public class Patient extends Person {
     }
 
     public List<Diseases> getDiseases() {
-        return diseases;
+        return diseases != null ? diseases : new ArrayList<>();
     }
 
     public void setDiseases(List<Diseases> diseases) {
-        this.diseases = diseases;
+        this.diseases = diseases != null ? diseases : new ArrayList<>();
     }
 
     public String getPatientId() {
@@ -61,11 +68,11 @@ public class Patient extends Person {
     }
 
     public Strength getPainStrength() {
-        return painStrength;
+        return painStrength != null ? painStrength : Strength.MEDIUM;
     }
 
     public void setPainStrength(Strength painStrength) {
-        this.painStrength = painStrength;
+        this.painStrength = painStrength != null ? painStrength : Strength.MEDIUM;
     }
 
     @Override

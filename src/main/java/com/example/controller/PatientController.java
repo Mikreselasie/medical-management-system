@@ -146,6 +146,14 @@ public class PatientController {
             }
             patient.setDiseases(diseases);
 
+            // Handle address
+            Address address = new Address();
+            address.setStreet(request.getParameter("address.street"));
+            address.setCity(request.getParameter("address.city"));
+            address.setState(request.getParameter("address.state"));
+            address.setZipCode(request.getParameter("address.zipCode"));
+            patient.setAddress(address);
+
             // Save the patient
             Patient savedPatient = patientRepository.save(patient);
             
