@@ -101,90 +101,47 @@ public class PatientController {
     }
 
     @PostMapping("/save")
-    public String savePatient(@Valid @ModelAttribute Patient patient, BindingResult result, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            try {
+    public String savePatient(@Valid @ModelAttribute("patient") Patient patient, 
+                            BindingResult result, 
+                            Model model,
+                            RedirectAttributes redirectAttributes) {
+        try {
+            if (result.hasErrors()) {
                 model.addAttribute("diseases", diseasesRepository.findAll());
                 model.addAttribute("genders", Gender.values());
                 model.addAttribute("strengths", Strength.values());
                 return "patients/form";
-            } catch (Exception e) {
-                logger.error("Error loading form data: ", e);
-                model.addAttribute("error", "Error loading form data. Please try again later.");
-                return "redirect:/patients/list";
             }
-        }
-        
-        try {
-            // Generate a unique patient ID
-            String patientId = "P" + String.format("%03d", patientRepository.count() + 1);
-            patient.setPatientId(patientId);
-
-            // Convert pain strength from string to enum
-            String painStrengthStr = request.getParameter("painStrength");
-            if (painStrengthStr != null && !painStrengthStr.isEmpty()) {
-                try {
-                    Strength painStrength = Strength.valueOf(painStrengthStr);
-                    patient.setPainStrength(painStrength);
-                } catch (IllegalArgumentException e) {
-                    patient.setPainStrength(Strength.MEDIUM); // Default value
-                }
-            }
-
-            // Calculate date of birth from age
-            int age = patient.getAge();
-            LocalDate currentDate = LocalDate.now();
-            LocalDate dateOfBirth = currentDate.minusYears(age);
-            patient.setDateOfBirth(dateOfBirth);
-
-            // Handle diseases
-            String[] diseaseIds = request.getParameterValues("diseases");
-            List<Diseases> diseases = new ArrayList<>();
-            if (diseaseIds != null && diseaseIds.length > 0) {
-                for (String diseaseId : diseaseIds) {
-                    try {
-                        Long id = Long.parseLong(diseaseId);
-                        Optional<Diseases> disease = diseasesRepository.findById(id);
-                        if (disease.isPresent()) {
-                            Diseases d = disease.get();
-                            if (d.getDiseaseType() == null) {
-                                d.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
-                            }
-                            diseases.add(d);
-                        }
-                    } catch (NumberFormatException e) {
-                        logger.warn("Invalid disease ID: {}", diseaseId);
-                    }
-                }
-            }
-            patient.setDiseases(diseases);
 
             // Handle address
-            Address address = new Address();
-            address.setStreet(request.getParameter("address.street"));
-            address.setCity(request.getParameter("address.city"));
-            address.setState(request.getParameter("address.state"));
-            address.setZipCode(request.getParameter("address.zipCode"));
-            patient.setAddress(address);
+            if (patient.getAddress() == null) {
+                patient.setAddress(new Address());
+            }
 
-            // Save the patient
+            // Initialize diseases list if null
+            if (patient.getDiseases() == null) {
+                patient.setDiseases(new ArrayList<>());
+            }
+
+            // Ensure each disease has a valid diseaseType
+            for (Diseases disease : patient.getDiseases()) {
+                if (disease == null || disease.getDiseaseType() == null) {
+                    if (disease == null) {
+                        disease = new Diseases();
+                    }
+                    disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
+                }
+            }
+
             Patient savedPatient = patientRepository.save(patient);
-            
-            // Add success message and patient data to flash attributes
-            redirectAttributes.addFlashAttribute("success", "Patient registered successfully");
-            redirectAttributes.addFlashAttribute("patient", savedPatient);
-            
+            redirectAttributes.addFlashAttribute("success", "Patient saved successfully");
             return "redirect:/patients/list";
         } catch (Exception e) {
             logger.error("Error saving patient: ", e);
-            model.addAttribute("error", "Error registering patient: " + e.getMessage());
-            try {
-                model.addAttribute("diseases", diseasesRepository.findAll());
-                model.addAttribute("genders", Gender.values());
-                model.addAttribute("strengths", Strength.values());
-            } catch (Exception ex) {
-                logger.error("Error loading form data: ", ex);
-            }
+            model.addAttribute("error", "Error saving patient: " + e.getMessage());
+            model.addAttribute("diseases", diseasesRepository.findAll());
+            model.addAttribute("genders", Gender.values());
+            model.addAttribute("strengths", Strength.values());
             return "patients/form";
         }
     }
