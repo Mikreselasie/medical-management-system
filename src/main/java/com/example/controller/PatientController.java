@@ -138,17 +138,24 @@ public class PatientController {
                 patient.setDiseases(new ArrayList<>());
             }
 
-            // Ensure each disease has a valid diseaseType
-            for (Diseases disease : patient.getDiseases()) {
-                if (disease == null || disease.getDiseaseType() == null) {
-                    if (disease == null) {
-                        disease = new Diseases();
+            // Save the patient first to get the ID
+            Patient savedPatient = patientRepository.save(patient);
+
+            // Now handle diseases
+            if (savedPatient.getDiseases() != null) {
+                List<Diseases> validDiseases = new ArrayList<>();
+                for (Diseases disease : savedPatient.getDiseases()) {
+                    if (disease != null && disease.getId() != null) {
+                        Optional<Diseases> existingDisease = diseasesRepository.findById(disease.getId());
+                        if (existingDisease.isPresent()) {
+                            validDiseases.add(existingDisease.get());
+                        }
                     }
-                    disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
                 }
+                savedPatient.setDiseases(validDiseases);
+                savedPatient = patientRepository.save(savedPatient);
             }
 
-            Patient savedPatient = patientRepository.save(patient);
             redirectAttributes.addFlashAttribute("success", "Patient saved successfully");
             return "redirect:/patients/list";
         } catch (Exception e) {
@@ -191,7 +198,9 @@ public class PatientController {
     }
 
     @PostMapping("/update/{id}")
-    public String updatePatient(@PathVariable Long id, @Valid @ModelAttribute Patient patient, BindingResult result, Model model, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    public String updatePatient(@PathVariable Long id, @Valid @ModelAttribute Patient patient, 
+                              BindingResult result, Model model, HttpServletRequest request, 
+                              RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             try {
                 model.addAttribute("diseases", diseasesRepository.findAll());
@@ -243,11 +252,7 @@ public class PatientController {
                             Long diseaseIdLong = Long.parseLong(diseaseId);
                             Optional<Diseases> disease = diseasesRepository.findById(diseaseIdLong);
                             if (disease.isPresent()) {
-                                Diseases d = disease.get();
-                                if (d.getDiseaseType() == null) {
-                                    d.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
-                                }
-                                diseases.add(d);
+                                diseases.add(disease.get());
                             }
                         } catch (NumberFormatException e) {
                             logger.warn("Invalid disease ID: {}", diseaseId);

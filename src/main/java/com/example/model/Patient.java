@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
 public class Patient extends Person {
     private String idNumber;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "patient_diseases",
         joinColumns = @JoinColumn(name = "patient_id"),
@@ -40,6 +40,23 @@ public class Patient extends Person {
         this.diseases = diseases != null ? diseases : new ArrayList<>();
         this.patientId = patientId;
         this.painStrength = painStrength != null ? painStrength : Strength.MEDIUM;
+    }
+
+    // Helper methods for disease management
+    public void addDisease(Diseases disease) {
+        if (disease != null && !diseases.contains(disease)) {
+            diseases.add(disease);
+        }
+    }
+
+    public void removeDisease(Diseases disease) {
+        if (disease != null) {
+            diseases.remove(disease);
+        }
+    }
+
+    public void clearDiseases() {
+        diseases.clear();
     }
 
     // Getters and Setters

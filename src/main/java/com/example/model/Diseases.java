@@ -1,6 +1,7 @@
 package com.example.model;
 
 import jakarta.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Diseases {
@@ -10,7 +11,7 @@ public class Diseases {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DiseaseType diseaseType = DiseaseType.UNKNOWN; // Default value
+    private DiseaseType diseaseType;
 
     public enum DiseaseType {
         // Respiratory Diseases
@@ -103,7 +104,6 @@ public class Diseases {
         }
     }
 
-    // No-arg constructor required by JPA
     public Diseases() {
         this.diseaseType = DiseaseType.UNKNOWN;
     }
@@ -129,7 +129,20 @@ public class Diseases {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Diseases diseases = (Diseases) o;
+        return Objects.equals(id, diseases.id) && diseaseType == diseases.diseaseType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, diseaseType);
+    }
+
+    @Override
     public String toString() {
-        return diseaseType != null ? diseaseType.name() : DiseaseType.UNKNOWN.name();
+        return diseaseType != null ? diseaseType.name() : "UNKNOWN";
     }
 } 
