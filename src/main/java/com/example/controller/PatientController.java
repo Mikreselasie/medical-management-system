@@ -33,6 +33,10 @@ public class PatientController {
     public String listPatients(Model model) {
         try {
             List<Patient> patients = patientRepository.findAll();
+            if (patients == null) {
+                patients = new ArrayList<>();
+            }
+            
             // Initialize empty diseases list for patients with null diseases
             for (Patient patient : patients) {
                 if (patient.getDiseases() == null) {
@@ -40,7 +44,10 @@ public class PatientController {
                 }
                 // Ensure each disease has a valid diseaseType
                 for (Diseases disease : patient.getDiseases()) {
-                    if (disease.getDiseaseType() == null) {
+                    if (disease == null || disease.getDiseaseType() == null) {
+                        if (disease == null) {
+                            disease = new Diseases();
+                        }
                         disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
                     }
                 }
@@ -50,6 +57,7 @@ public class PatientController {
         } catch (Exception e) {
             logger.error("Error fetching patients: ", e);
             model.addAttribute("error", "Error loading patients. Please try again later.");
+            model.addAttribute("patients", new ArrayList<>());
             return "patients/list";
         }
     }
@@ -58,7 +66,17 @@ public class PatientController {
     public String showCreateForm(Model model) {
         try {
             model.addAttribute("patient", new Patient());
-            model.addAttribute("diseases", diseasesRepository.findAll());
+            List<Diseases> diseases = diseasesRepository.findAll();
+            if (diseases == null || diseases.isEmpty()) {
+                logger.warn("No diseases found in the database. Initializing diseases...");
+                // Initialize diseases if none exist
+                for (Diseases.DiseaseType type : Diseases.DiseaseType.values()) {
+                    Diseases disease = new Diseases(type);
+                    diseasesRepository.save(disease);
+                }
+                diseases = diseasesRepository.findAll();
+            }
+            model.addAttribute("diseases", diseases);
             model.addAttribute("genders", Gender.values());
             model.addAttribute("strengths", Strength.values());
             return "patients/form";
