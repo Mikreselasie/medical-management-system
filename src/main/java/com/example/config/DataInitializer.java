@@ -7,6 +7,7 @@ import com.example.model.Diseases;
 import com.example.repository.DiseasesRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.List;
 
 @Component
 // CommandLineRunner is an interface provided by Spring Boot that allows you to execute code when the application starts up. It's particularly useful for tasks that need to run once during application initialization,
@@ -29,7 +30,27 @@ public class DataInitializer implements CommandLineRunner {
                 }
                 logger.info("Disease initialization completed. Total diseases: {}", diseasesRepository.count());
             } else {
-                logger.info("Diseases already exist in the database. Total count: {}", diseasesRepository.count());
+                // Verify all disease types exist
+                List<Diseases> existingDiseases = diseasesRepository.findAll();
+                boolean needsUpdate = false;
+                
+                for (Diseases.DiseaseType type : Diseases.DiseaseType.values()) {
+                    boolean typeExists = existingDiseases.stream()
+                        .anyMatch(d -> d.getDiseaseType() == type);
+                    
+                    if (!typeExists) {
+                        Diseases disease = new Diseases(type);
+                        diseasesRepository.save(disease);
+                        logger.info("Added missing disease: {}", type);
+                        needsUpdate = true;
+                    }
+                }
+                
+                if (needsUpdate) {
+                    logger.info("Updated diseases in the database. Total diseases: {}", diseasesRepository.count());
+                } else {
+                    logger.info("All diseases already exist in the database. Total count: {}", diseasesRepository.count());
+                }
             }
         } catch (Exception e) {
             logger.error("Error initializing diseases: ", e);

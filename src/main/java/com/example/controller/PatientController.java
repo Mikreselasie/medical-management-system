@@ -84,7 +84,7 @@ public class PatientController {
             patient.setDiseases(new ArrayList<>());
             model.addAttribute("patient", patient);
 
-            // Load diseases
+            // Load diseases and sort them by type
             List<Diseases> diseases = diseasesRepository.findAll();
             if (diseases == null || diseases.isEmpty()) {
                 logger.warn("No diseases found in the database. Initializing diseases...");
@@ -95,6 +95,10 @@ public class PatientController {
                 }
                 diseases = diseasesRepository.findAll();
             }
+            
+            // Sort diseases by type name
+            diseases.sort((d1, d2) -> d1.getDiseaseType().name().compareTo(d2.getDiseaseType().name()));
+            
             model.addAttribute("diseases", diseases);
             model.addAttribute("genders", Gender.values());
             model.addAttribute("strengths", Strength.values());
