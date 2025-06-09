@@ -1,131 +1,117 @@
+// Entity class representing diseases in the medical system
+// Maps to the 'diseases' table in the database
 package com.example.model;
 
 import jakarta.persistence.*;
 import java.util.Objects;
 
-@Entity
+@Entity  // Marks this class as a JPA entity
+@Table(name = "diseases")  // Specifies the database table name
 public class Diseases {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id  // Marks this field as the primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-increment strategy
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private DiseaseType diseaseType;
-
+    // Enum representing different types of diseases
+    // Each type has associated treatments
     public enum DiseaseType {
         // Respiratory Diseases
-        ASTHMA("Inhalers, Bronchodilators, Corticosteroids"),
-        PNEUMONIA("Antibiotics, Rest, Fluids"),
-        BRONCHITIS("Antibiotics, Cough Medicine, Rest"),
-        COPD("Bronchodilators, Pulmonary Rehabilitation"),
-        TUBERCULOSIS("Antibiotics, Directly Observed Therapy"),
-        
+        ASTHMA("Bronchodilators, Inhaled corticosteroids"),
+        COPD("Bronchodilators, Pulmonary rehabilitation"),
+        PNEUMONIA("Antibiotics, Rest, Hydration"),
+        TUBERCULOSIS("Antitubercular drugs, Directly observed therapy"),
+
         // Cardiovascular Diseases
-        HYPERTENSION("ACE Inhibitors, Beta Blockers, Lifestyle Changes"),
-        HEART_DISEASE("Statins, Beta Blockers, Aspirin"),
-        ARRHYTHMIA("Antiarrhythmics, Pacemaker"),
-        CONGESTIVE_HEART_FAILURE("Diuretics, ACE Inhibitors, Beta Blockers"),
-        
+        HYPERTENSION("Antihypertensives, Lifestyle modifications"),
+        HEART_FAILURE("ACE inhibitors, Beta-blockers, Diuretics"),
+        CORONARY_ARTERY_DISEASE("Statins, Antiplatelet drugs, Beta-blockers"),
+        ARRHYTHMIA("Antiarrhythmics, Pacemaker therapy"),
+
         // Neurological Disorders
-        MIGRAINE("Triptans, Pain Relievers, Preventive Medications"),
-        EPILEPSY("Anticonvulsants, Lifestyle Management"),
-        PARKINSONS("Levodopa, Dopamine Agonists"),
-        MULTIPLE_SCLEROSIS("Disease-modifying Drugs, Physical Therapy"),
-        ALZHEIMERS("Cholinesterase Inhibitors, Memantine"),
-        
+        ALZHEIMERS("Cholinesterase inhibitors, Memantine"),
+        PARKINSONS("Levodopa, Dopamine agonists"),
+        MULTIPLE_SCLEROSIS("Disease-modifying therapies, Corticosteroids"),
+        EPILEPSY("Antiepileptic drugs, Ketogenic diet"),
+
         // Endocrine Disorders
-        DIABETES_TYPE_1("Insulin Therapy"),
-        DIABETES_TYPE_2("Oral Medications, Insulin"),
-        THYROID_DISORDER("Hormone Replacement, Anti-thyroid Medications"),
-        ADDISONS_DISEASE("Corticosteroid Replacement"),
-        
+        DIABETES("Insulin therapy, Blood glucose monitoring"),  // Keeping for backward compatibility
+        DIABETES_TYPE_1("Insulin therapy, Blood glucose monitoring"),
+        DIABETES_TYPE_2("Oral antidiabetics, Lifestyle modifications"),
+        HYPOTHYROIDISM("Levothyroxine, Thyroid hormone replacement"),
+        HYPERTHYROIDISM("Antithyroid drugs, Radioactive iodine"),
+
         // Gastrointestinal Disorders
-        ULCER("Antacids, Antibiotics, Proton Pump Inhibitors"),
-        CROHNS_DISEASE("Anti-inflammatory Drugs, Immunosuppressants"),
-        IRRITABLE_BOWEL_SYNDROME("Diet Modification, Antispasmodics"),
-        GASTRITIS("Antacids, Proton Pump Inhibitors"),
-        
+        CROHNS_DISEASE("Anti-inflammatory drugs, Immunosuppressants"),
+        ULCERATIVE_COLITIS("Aminosalicylates, Corticosteroids"),
+        CIRRHOSIS("Liver support medications, Lifestyle changes"),
+        PANCREATITIS("Pain management, Enzyme replacement"),
+
         // Musculoskeletal Disorders
-        ARTHRITIS("NSAIDs, Physical Therapy, Joint Protection"),
-        OSTEOPOROSIS("Calcium Supplements, Bisphosphonates"),
-        FIBROMYALGIA("Pain Medications, Physical Therapy"),
-        GOUT("NSAIDs, Colchicine, Allopurinol"),
-        
+        RHEUMATOID_ARTHRITIS("DMARDs, Biologic agents"),
+        OSTEOARTHRITIS("Pain relievers, Physical therapy"),
+        OSTEOPOROSIS("Bisphosphonates, Calcium supplements"),
+        GOUT("Colchicine, Uric acid lowering drugs"),
+
         // Infectious Diseases
-        MALARIA("Antimalarial Drugs, Prevention Measures"),
-        HEPATITIS("Antiviral Medications, Supportive Care"),
-        HIV_AIDS("Antiretroviral Therapy"),
-        COVID_19("Vaccination, Antiviral Medications"),
-        
+        HIV_AIDS("Antiretroviral therapy, Opportunistic infection prophylaxis"),
+        HEPATITIS_B("Antiviral drugs, Liver monitoring"),
+        HEPATITIS_C("Direct-acting antivirals, Liver monitoring"),
+        COVID_19("Antiviral drugs, Supportive care"),
+
+        // Skin Conditions
+        PSORIASIS("Topical treatments, Phototherapy"),
+        ECZEMA("Moisturizers, Topical corticosteroids"),
+        ACNE("Topical retinoids, Antibiotics"),
+        DERMATITIS("Topical steroids, Antihistamines"),
+
+        // Cancer Types
+        BREAST_CANCER("Surgery, Chemotherapy, Radiation therapy"),
+        LUNG_CANCER("Surgery, Chemotherapy, Targeted therapy"),
+        PROSTATE_CANCER("Hormone therapy, Radiation therapy"),
+        COLON_CANCER("Surgery, Chemotherapy, Targeted therapy"),
+        LIVER_CANCER("Surgery, Chemotherapy, Targeted therapy"),
+        PANCREATIC_CANCER("Surgery, Chemotherapy, Targeted therapy"),
+        LEUKEMIA("Chemotherapy, Stem cell transplantation"),
+        LYMPHOMA("Chemotherapy, Radiation therapy, Immunotherapy"),
+
         // Mental Health
         DEPRESSION("Antidepressants, Psychotherapy"),
-        ANXIETY("Anti-anxiety Medications, Therapy"),
-        BIPOLAR_DISORDER("Mood Stabilizers, Antipsychotics"),
-        SCHIZOPHRENIA("Antipsychotics, Psychotherapy"),
-        
-        // Dermatological Conditions
-        PSORIASIS("Topical Treatments, Phototherapy"),
-        ECZEMA("Moisturizers, Corticosteroids"),
-        ACNE("Topical Medications, Antibiotics"),
-        DERMATITIS("Topical Steroids, Antihistamines"),
-        
-        // Eye Conditions
-        GLAUCOMA("Eye Drops, Surgery"),
-        CATARACTS("Surgery, Corrective Lenses"),
-        MACULAR_DEGENERATION("Anti-VEGF Injections, Supplements"),
-        
-        // Kidney Disorders
-        KIDNEY_STONES("Pain Management, Hydration"),
-        KIDNEY_FAILURE("Dialysis, Transplant"),
-        NEPHRITIS("Immunosuppressants, Blood Pressure Control"),
-        
-        // Blood Disorders
-        ANEMIA("Iron Supplements, Vitamin B12"),
-        LEUKEMIA("Chemotherapy, Bone Marrow Transplant"),
-        HEMOPHILIA("Factor Replacement Therapy"),
-        THALASSEMIA("Blood Transfusions, Iron Chelation"),
-        
-        // Autoimmune Disorders
-        LUPUS("Immunosuppressants, Anti-inflammatory Drugs"),
-        RHEUMATOID_ARTHRITIS("DMARDs, Biologics"),
-        CELIAC_DISEASE("Gluten-free Diet"),
-        
-        // Cancer Types
-        BREAST_CANCER("Surgery, Chemotherapy, Radiation"),
-        LUNG_CANCER("Surgery, Chemotherapy, Targeted Therapy"),
-        PROSTATE_CANCER("Surgery, Hormone Therapy"),
-        COLON_CANCER("Surgery, Chemotherapy"),
-        LIVER_CANCER("Surgery, Targeted Therapy"),
-        PANCREATIC_CANCER("Surgery, Chemotherapy"),
-        OVARIAN_CANCER("Surgery, Chemotherapy"),
-        LYMPHOMA("Chemotherapy, Radiation"),
-        
-        // Other Common Conditions
-        ALLERGIES("Antihistamines, Avoidance"),
-        OBESITY("Diet, Exercise, Medication"),
-        INSOMNIA("Sleep Hygiene, Medication"),
-        UNKNOWN("Consultation Required");
+        ANXIETY("Anxiolytics, Cognitive behavioral therapy"),
+        BIPOLAR_DISORDER("Mood stabilizers, Antipsychotics"),
+        SCHIZOPHRENIA("Antipsychotics, Psychosocial therapy"),
 
-        private final String treatment;
+        // Other Conditions
+        MIGRAINE("Pain relievers, Preventive medications"),
+        ANEMIA("Iron supplements, Vitamin B12"),
+        UNKNOWN("Unknown treatment");  // Default case for unknown diseases
 
-        DiseaseType(String treatment) {
-            this.treatment = treatment;
+        private final String treatments;  // Stores the treatments for each disease type
+
+        // Constructor for the enum
+        DiseaseType(String treatments) {
+            this.treatments = treatments;
         }
 
-        public String getTreatment() {
-            return treatment;
+        // Getter for treatments
+        public String getTreatments() {
+            return treatments;
         }
     }
 
-    public Diseases() {
-        this.diseaseType = DiseaseType.UNKNOWN;
-    }
+    @Enumerated(EnumType.STRING)  // Store enum as string in database
+    @Column(nullable = false)  // This field cannot be null
+    private DiseaseType diseaseType;  // The type of disease
 
+    // Default constructor required by JPA
+    public Diseases() {}
+
+    // Constructor with disease type
     public Diseases(DiseaseType diseaseType) {
-        this.diseaseType = diseaseType != null ? diseaseType : DiseaseType.UNKNOWN;
+        this.diseaseType = diseaseType;
     }
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -135,13 +121,14 @@ public class Diseases {
     }
 
     public DiseaseType getDiseaseType() {
-        return diseaseType != null ? diseaseType : DiseaseType.UNKNOWN;
+        return diseaseType;
     }
 
     public void setDiseaseType(DiseaseType diseaseType) {
-        this.diseaseType = diseaseType != null ? diseaseType : DiseaseType.UNKNOWN;
+        this.diseaseType = diseaseType;
     }
 
+    // Equals and HashCode methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -155,8 +142,12 @@ public class Diseases {
         return Objects.hash(id, diseaseType);
     }
 
+    // ToString method
     @Override
     public String toString() {
-        return diseaseType != null ? diseaseType.name() : "UNKNOWN";
+        return "Diseases{" +
+                "id=" + id +
+                ", diseaseType=" + diseaseType +
+                '}';
     }
 } 
