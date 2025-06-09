@@ -80,7 +80,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="idNumber" class="form-label">ID Number</label>
+                                    <label for="idNumber" class="form-label">ID Number (Optional)</label>
                                     <input type="text" class="form-control" id="idNumber" th:field="*{idNumber}">
                                     <div class="invalid-feedback" th:if="${#fields.hasErrors('idNumber')}" th:errors="*{idNumber}">
                                         ID number error
@@ -114,7 +114,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-2">
-                                    <label for="zipCode" class="form-label">Zip Code</label>
+                                    <label for="zipCode" class="form-label">Zip Code (Optional)</label>
                                     <input type="text" class="form-control" id="zipCode" th:field="*{address.zipCode}">
                                     <div class="invalid-feedback" th:if="${#fields.hasErrors('address.zipCode')}" th:errors="*{address.zipCode}">
                                         Zip code error
@@ -137,7 +137,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="diseases" class="form-label">Diseases</label>
+                                    <label for="diseases" class="form-label">Diseases (Optional)</label>
                                     <select class="form-select" id="diseases" th:field="*{diseases}" multiple>
                                         <option th:each="disease : ${diseases}"
                                                 th:value="${disease.id}"

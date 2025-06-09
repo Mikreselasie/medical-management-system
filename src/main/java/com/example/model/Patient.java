@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotBlank;
 @Entity
 @Table(name = "patients")
 public class Patient extends Person {
-    @NotBlank(message = "ID Number is required")
     @Column(unique = true)
     private String idNumber;
 
@@ -22,11 +21,9 @@ public class Patient extends Person {
     )
     private List<Diseases> diseases = new ArrayList<>();
 
-    @NotBlank(message = "Patient ID is required")
     @Column(unique = true)
     private String patientId;
 
-    @NotNull(message = "Pain strength is required")
     @Enumerated(EnumType.STRING)
     private Strength painStrength = Strength.MEDIUM; // Default value
 
@@ -34,6 +31,7 @@ public class Patient extends Person {
     public Patient() {
         super();
         this.diseases = new ArrayList<>();
+        this.painStrength = Strength.MEDIUM;
     }
 
     // Parameterized constructor

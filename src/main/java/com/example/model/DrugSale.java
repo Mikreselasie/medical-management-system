@@ -27,7 +27,7 @@ public class DrugSale {
     private String buyerPhone;
 
     @NotNull(message = "Drug is required")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "drug_id", nullable = false)
     private Drug drug;
 

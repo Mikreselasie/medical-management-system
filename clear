@@ -1,0 +1,10 @@
+[33m7cd4fbb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Fix: Add ARTHRITIS to OSTEOARTHRITIS conversion in DataInitializer
+[33m76a8c16[m Fix: Add DIABETES enum value for backward compatibility
+[33m4018870[m Fix: Add conversion from DIABETES to DIABETES_TYPE_2 in DataInitializer
+[33md5c09d2[m Refactor: Add validation, optimistic locking, and pagination to Drug and DrugSale models and DrugController
+[33mb3facfd[m Fix: Use DIABETES_TYPE_2 for disease initialization in DrugDataInitializer
+[33me466e49[m Refactor: Rebuild disease system with comprehensive types and improved initialization
+[33m833cca3[m Fix: Handle invalid disease types in DataInitializer and PatientController
+[33ma4673d0[m Fix: Handle patient deletion with proper disease relationship cleanup
+[33mb8e1de0[m Fix: Handle invalid disease types in Patient and Drug controllers
+[33mc8015b1[m Fix: Handle invalid disease types gracefully in PatientController

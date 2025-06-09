@@ -28,7 +28,8 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
 
-                        <form th:action="@{/drug-sales}" th:object="${sale}" method="post" class="needs-validation" novalidate>
+                        <form th:action="${sale.id == null ? '/drug-sales' : '/drug-sales/' + sale.id + '/edit'}" 
+                              th:object="${sale}" method="post" class="needs-validation" novalidate>
                             <!-- Buyer Information -->
                             <div class="card mb-4">
                                 <div class="card-header bg-light">

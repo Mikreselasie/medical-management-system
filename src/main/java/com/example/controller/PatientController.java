@@ -132,6 +132,7 @@ public class PatientController {
                              HttpServletRequest request) {
         try {
             if (result.hasErrors()) {
+                logger.error("Validation errors: {}", result.getAllErrors());
                 // Add necessary attributes for form re-rendering
                 model.addAttribute("diseases", diseasesRepository.findAll());
                 model.addAttribute("genders", Gender.values());
@@ -139,13 +140,15 @@ public class PatientController {
                 return "patients/form";
             }
 
-            // Handle address
+            // Initialize address if null
             if (patient.getAddress() == null) {
                 patient.setAddress(new Address());
             }
 
             // Initialize diseases list
-            patient.setDiseases(new ArrayList<>());
+            if (patient.getDiseases() == null) {
+                patient.setDiseases(new ArrayList<>());
+            }
 
             // Handle diseases selection
             String[] diseaseIds = request.getParameterValues("diseases");
@@ -165,15 +168,19 @@ public class PatientController {
 
             // Generate patient ID if not set
             if (patient.getPatientId() == null || patient.getPatientId().trim().isEmpty()) {
-                // Get the count of existing patients and add 1 for the new patient
                 long patientCount = patientRepository.count() + 1;
-                // Format the ID as P followed by 6 digits, padding with zeros if necessary
                 String patientId = String.format("P%06d", patientCount);
                 patient.setPatientId(patientId);
             }
 
+            // Set default pain strength if not set
+            if (patient.getPainStrength() == null) {
+                patient.setPainStrength(Strength.MEDIUM);
+            }
+
             // Save the patient
             Patient savedPatient = patientRepository.save(patient);
+            logger.info("Successfully saved patient with ID: {}", savedPatient.getId());
             redirectAttributes.addFlashAttribute("success", "Patient saved successfully");
             return "redirect:/patients/list";
         } catch (Exception e) {
