@@ -31,12 +31,12 @@ public class Drug {
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.0", inclusive = true, message = "Price must be greater than or equal to 0")
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    private BigDecimal price = BigDecimal.ZERO;
 
     @NotNull(message = "Quantity is required")
     @Min(value = 0, message = "Quantity must be greater than or equal to 0")
     @Column(nullable = false)
-    private Integer quantity;
+    private Integer quantity = 0;
 
     @Future(message = "Expiry date must be in the future")
     @Column(name = "expiry_date")
@@ -45,7 +45,7 @@ public class Drug {
     @NotNull(message = "Drug category is required")
     @Enumerated(EnumType.STRING)
     @Column(name = "drug_category", nullable = false)
-    private DrugCategory drugCategory;
+    private DrugCategory drugCategory = DrugCategory.OTHER;
 
     @Size(max = 1000, message = "Side effects description cannot exceed 1000 characters")
     @Column(name = "side_effects", length = 1000)
@@ -66,7 +66,11 @@ public class Drug {
     private Diseases disease;
 
     // Default constructor required by JPA
-    public Drug() {}
+    public Drug() {
+        this.price = BigDecimal.ZERO;
+        this.quantity = 0;
+        this.drugCategory = DrugCategory.OTHER;
+    }
 
     // Parameterized constructor with validation
     public Drug(String name, String manufacturer, LocalDate expiryDate, 
@@ -76,12 +80,12 @@ public class Drug {
         this.name = name;
         this.manufacturer = manufacturer;
         this.expiryDate = expiryDate;
-        this.price = price;
-        this.quantity = quantity;
+        this.price = price != null ? price : BigDecimal.ZERO;
+        this.quantity = quantity != null ? quantity : 0;
         this.description = description;
         this.sideEffects = sideEffects;
         this.strength = strength;
-        this.drugCategory = drugCategory;
+        this.drugCategory = drugCategory != null ? drugCategory : DrugCategory.OTHER;
         this.disease = disease;
     }
 
@@ -232,17 +236,11 @@ public class Drug {
     public String toString() {
         return "Drug{" +
                 "id=" + id +
-                ", version=" + version +
                 ", name='" + name + '\'' +
                 ", manufacturer='" + manufacturer + '\'' +
                 ", price=" + price +
                 ", quantity=" + quantity +
-                ", expiryDate=" + expiryDate +
                 ", drugCategory=" + drugCategory +
-                ", sideEffects='" + sideEffects + '\'' +
-                ", strength='" + strength + '\'' +
-                ", description='" + description + '\'' +
-                ", disease=" + disease +
                 '}';
     }
 } 

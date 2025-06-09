@@ -25,6 +25,7 @@ import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 // Marks this class as a Spring MVC controller
 @Controller
@@ -54,6 +55,9 @@ public class DrugController {
             @RequestParam(defaultValue = "asc") String direction,
             Model model) {
         try {
+            logger.info("Listing drugs with search: {}, page: {}, size: {}, sortBy: {}, direction: {}", 
+                       search, page, size, sortBy, direction);
+            
             Pageable pageable = PageRequest.of(page, size, 
                 Sort.Direction.fromString(direction), sortBy);
             
@@ -65,17 +69,26 @@ public class DrugController {
                 drugsPage = drugRepository.findAll(pageable);
             }
 
-            model.addAttribute("drugs", drugsPage.getContent());
+            // Initialize empty list if null
+            List<Drug> drugs = drugsPage.getContent();
+            if (drugs == null) {
+                drugs = new ArrayList<>();
+            }
+
+            model.addAttribute("drugs", drugs);
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", drugsPage.getTotalPages());
             model.addAttribute("totalItems", drugsPage.getTotalElements());
             model.addAttribute("search", search);
             model.addAttribute("sortBy", sortBy);
             model.addAttribute("direction", direction);
+            
+            logger.info("Successfully retrieved {} drugs", drugs.size());
             return "drugs/list";
         } catch (Exception e) {
             logger.error("Error listing drugs: ", e);
             model.addAttribute("errorMessage", "Error loading drugs. Please try again later.");
+            model.addAttribute("drugs", new ArrayList<>()); // Return empty list on error
             return "drugs/list";
         }
     }

@@ -97,6 +97,13 @@
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-md-10">
+                <!-- Error Message Alert -->
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3 class="card-title mb-0">
@@ -144,33 +151,38 @@
                                 </thead>
                                 <tbody>
                                     <tr th:each="drug : ${drugs}">
-                                        <td th:text="${drug.name}"></td>
-                                        <td th:text="${drug.manufacturer}"></td>
+                                        <td th:text="${drug?.name ?: 'N/A'}"></td>
+                                        <td th:text="${drug?.manufacturer ?: 'N/A'}"></td>
                                         <td>
-                                            <span th:class="${'badge ' + 
-                                                (drug.quantity > 50 ? 'bg-success' : 
-                                                 drug.quantity > 10 ? 'bg-warning' : 'bg-danger')}"
+                                            <span th:if="${drug?.quantity != null}" 
+                                                  th:class="${'badge ' + 
+                                                    (drug.quantity > 50 ? 'bg-success' : 
+                                                     drug.quantity > 10 ? 'bg-warning' : 'bg-danger')}"
                                                   th:text="${drug.quantity + ' units'}">
                                             </span>
+                                            <span th:unless="${drug?.quantity != null}" 
+                                                  class="badge bg-secondary">N/A</span>
                                         </td>
-                                        <td th:text="${'$' + #numbers.formatDecimal(drug.price, 1, 2)}"></td>
+                                        <td th:text="${drug?.price != null ? '$' + #numbers.formatDecimal(drug.price, 1, 2) : 'N/A'}"></td>
                                         <td>
-                                            <span th:if="${drug.disease != null}" 
+                                            <span th:if="${drug?.disease?.diseaseType != null}" 
                                                   th:text="${drug.disease.diseaseType}"
                                                   class="badge bg-info">
                                             </span>
-                                            <span th:unless="${drug.disease != null}" 
+                                            <span th:unless="${drug?.disease?.diseaseType != null}" 
                                                   class="badge bg-secondary">
                                                 Not specified
                                             </span>
                                         </td>
                                         <td>
                                             <div class="btn-group">
-                                                <a th:href="@{/drugs/{id}/edit(id=${drug.id})}" 
+                                                <a th:if="${drug?.id != null}"
+                                                   th:href="@{/drugs/{id}/edit(id=${drug.id})}" 
                                                    class="btn btn-sm btn-outline-primary">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a th:href="@{/drugs/{id}/delete(id=${drug.id})}"
+                                                <a th:if="${drug?.id != null}"
+                                                   th:href="@{/drugs/{id}/delete(id=${drug.id})}"
                                                    class="btn btn-sm btn-outline-danger"
                                                    onclick="return confirm('Are you sure you want to delete this drug?')">
                                                     <i class="fas fa-trash"></i>
