@@ -14,7 +14,7 @@ public class Patient extends Person {
     @Column(unique = true)
     private String idNumber;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @JoinTable(
         name = "patient_diseases",
         joinColumns = @JoinColumn(name = "patient_id"),
