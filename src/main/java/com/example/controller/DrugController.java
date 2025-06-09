@@ -83,47 +83,12 @@ public class DrugController {
     // ================================
     // 2. SHOW FORM TO ADD NEW DRUG
     // ================================
-    @GetMapping("/new")
-    @Transactional(readOnly = true)
+    @GetMapping("/drugs/new")
     public String showDrugForm(Model model) {
         try {
-            Drug drug = new Drug();
-            model.addAttribute("drug", drug);
-            
-            // Load diseases and sort them by type
-            List<Diseases> diseases = diseasesRepository.findAll();
-            if (diseases == null || diseases.isEmpty()) {
-                logger.warn("No diseases found in the database. Initializing diseases...");
-                // Initialize diseases if none exist
-                for (Diseases.DiseaseType type : Diseases.DiseaseType.values()) {
-                    Diseases disease = new Diseases(type);
-                    diseasesRepository.save(disease);
-                }
-                diseases = diseasesRepository.findAll();
-            } else {
-                // Check for and fix any invalid disease types
-                boolean hasInvalidTypes = false;
-                for (Diseases disease : diseases) {
-                    try {
-                        // This will throw an exception if the disease type is invalid
-                        disease.getDiseaseType();
-                    } catch (Exception e) {
-                        logger.warn("Found invalid disease type in database: {}", disease);
-                        hasInvalidTypes = true;
-                        // Set to UNKNOWN type
-                        disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
-                        diseasesRepository.save(disease);
-                    }
-                }
-                if (hasInvalidTypes) {
-                    diseases = diseasesRepository.findAll();
-                }
-            }
-            
-            // Sort diseases by type name
-            diseases.sort((d1, d2) -> d1.getDiseaseType().name().compareTo(d2.getDiseaseType().name()));
-            
-            model.addAttribute("diseases", diseases);
+            logger.info("Showing drug form");
+            model.addAttribute("drug", new Drug());
+            model.addAttribute("diseases", diseasesRepository.findAll());
             model.addAttribute("drugCategories", DrugCategory.values());
             return "drugs/form";
         } catch (Exception e) {

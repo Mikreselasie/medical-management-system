@@ -86,6 +86,14 @@ public class Diseases {
         // Other Conditions
         MIGRAINE("Pain relievers, Preventive medications"),
         ANEMIA("Iron supplements, Vitamin B12"),
+        HEART_DISEASE("Heart medications, Lifestyle modifications"),
+        KIDNEY_DISEASE("Kidney medications, Dialysis"),
+        LIVER_DISEASE("Liver medications, Liver transplantation"),
+        PANCREAS_DISEASE("Pancreas medications, Pancreas transplantation"),
+        BLOOD_DISEASE("Blood medications, Blood transfusions"),
+        ENDOCRINE_DISEASE("Endocrine medications, Endocrine surgery"),
+        IMMUNOLOGY_DISEASE("Immunology medications, Immunology surgery"),
+        NEUROLOGY_DISEASE("Neurology medications, Neurology surgery"),
         UNKNOWN("Unknown treatment");  // Default case for unknown diseases
 
         private final String treatments;  // Stores the treatments for each disease type
