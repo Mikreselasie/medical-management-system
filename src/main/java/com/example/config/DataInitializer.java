@@ -41,9 +41,22 @@ public class DataInitializer implements CommandLineRunner {
                 } catch (Exception e) {
                     logger.warn("Found invalid disease type in database: {}", disease);
                     hasInvalidTypes = true;
-                    // Set to UNKNOWN type
-                    disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
-                    diseasesRepository.save(disease);
+                    
+                    // Special handling for "CANCER" type
+                    if (disease.getDiseaseType().toString().equals("CANCER")) {
+                        logger.info("Converting generic CANCER type to BREAST_CANCER");
+                        disease.setDiseaseType(Diseases.DiseaseType.BREAST_CANCER);
+                    } else {
+                        // Set to UNKNOWN type for other invalid types
+                        disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
+                    }
+                    
+                    try {
+                        diseasesRepository.save(disease);
+                        logger.info("Successfully fixed invalid disease type: {}", disease);
+                    } catch (Exception saveEx) {
+                        logger.error("Failed to save fixed disease: {}", disease, saveEx);
+                    }
                 }
             }
             
@@ -59,18 +72,31 @@ public class DataInitializer implements CommandLineRunner {
                 // Add all disease types
                 for (Diseases.DiseaseType type : Diseases.DiseaseType.values()) {
                     if (type != Diseases.DiseaseType.UNKNOWN) {  // Skip UNKNOWN type
-                        diseases.add(new Diseases(type));
+                        try {
+                            Diseases newDisease = new Diseases(type);
+                            diseases.add(newDisease);
+                            logger.debug("Added disease type: {}", type);
+                        } catch (Exception e) {
+                            logger.error("Failed to create disease for type: {}", type, e);
+                        }
                     }
                 }
                 
-                diseasesRepository.saveAll(diseases);
-                logger.info("Successfully initialized {} diseases", diseases.size());
+                try {
+                    diseasesRepository.saveAll(diseases);
+                    logger.info("Successfully initialized {} diseases", diseases.size());
+                } catch (Exception e) {
+                    logger.error("Failed to save diseases: {}", e.getMessage(), e);
+                    throw e;
+                }
             } else {
                 logger.info("Diseases already initialized, skipping...");
             }
         } catch (Exception e) {
             logger.error("Error initializing diseases: {}", e.getMessage(), e);
-            throw e;
+            // Don't throw the exception, just log it
+            // This allows the application to continue even if disease initialization fails
+            logger.warn("Continuing application startup despite disease initialization error");
         }
     }
 } 

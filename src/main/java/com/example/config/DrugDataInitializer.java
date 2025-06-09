@@ -25,7 +25,7 @@ public class DrugDataInitializer implements CommandLineRunner {
         // Only initialize if the drug repository is empty
         if (drugRepository.count() == 0) {
             // Get diseases from database
-            List<Diseases> diabetesList = diseasesRepository.findByDiseaseType(Diseases.DiseaseType.DIABETES);
+            List<Diseases> diabetesList = diseasesRepository.findByDiseaseType(Diseases.DiseaseType.DIABETES_TYPE_2);
             List<Diseases> hypertensionList = diseasesRepository.findByDiseaseType(Diseases.DiseaseType.HYPERTENSION);
             
             // Get the first disease from each list, or null if empty
