@@ -136,7 +136,10 @@ public class PatientController {
 
             // Generate patient ID if not set
             if (patient.getPatientId() == null || patient.getPatientId().trim().isEmpty()) {
-                String patientId = "PAT" + System.currentTimeMillis();
+                // Get the count of existing patients and add 1 for the new patient
+                long patientCount = patientRepository.count() + 1;
+                // Format the ID as P followed by 6 digits, padding with zeros if necessary
+                String patientId = String.format("P%06d", patientCount);
                 patient.setPatientId(patientId);
             }
 
