@@ -17,6 +17,7 @@ public class Diseases {
     // Each type has associated treatments
     public enum DiseaseType {
         // Respiratory Diseases
+        ARTHRITIS("Anti-inflammatory drugs, Immunosuppressants"),
         ASTHMA("Bronchodilators, Inhaled corticosteroids"),
         COPD("Bronchodilators, Pulmonary rehabilitation"),
         PNEUMONIA("Antibiotics, Rest, Hydration"),
