@@ -79,6 +79,24 @@ public class DrugController {
                     diseasesRepository.save(disease);
                 }
                 diseases = diseasesRepository.findAll();
+            } else {
+                // Check for and fix any invalid disease types
+                boolean hasInvalidTypes = false;
+                for (Diseases disease : diseases) {
+                    try {
+                        // This will throw an exception if the disease type is invalid
+                        disease.getDiseaseType();
+                    } catch (Exception e) {
+                        logger.warn("Found invalid disease type in database: {}", disease);
+                        hasInvalidTypes = true;
+                        // Set to UNKNOWN type
+                        disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
+                        diseasesRepository.save(disease);
+                    }
+                }
+                if (hasInvalidTypes) {
+                    diseases = diseasesRepository.findAll();
+                }
             }
             
             // Sort diseases by type name
