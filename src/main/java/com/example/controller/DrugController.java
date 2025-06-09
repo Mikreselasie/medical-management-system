@@ -2,7 +2,12 @@ package com.example.controller;
 
 // Importing required dependencies
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +24,7 @@ import com.example.repository.DiseasesRepository;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 // Marks this class as a Spring MVC controller
 @Controller
@@ -26,6 +32,7 @@ import java.util.List;
 public class DrugController {
 
     private static final Logger logger = LoggerFactory.getLogger(DrugController.class);
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     // Injecting the DrugRepository (interface to the database for Drug)
     @Autowired
@@ -39,20 +46,33 @@ public class DrugController {
     // 1. LIST ALL DRUGS + SEARCH
     // ================================
     @GetMapping
-    public String listDrugs(@RequestParam(required = false, name = "search") String search, Model model) {
+    public String listDrugs(
+            @RequestParam(required = false, name = "search") String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            Model model) {
         try {
-            List<Drug> drugs;
+            Pageable pageable = PageRequest.of(page, size, 
+                Sort.Direction.fromString(direction), sortBy);
             
-            // If a search query is given, filter drugs by name or manufacturer
+            Page<Drug> drugsPage;
             if (search != null && !search.trim().isEmpty()) {
-                drugs = drugRepository.findByNameContainingIgnoreCaseOrManufacturerContainingIgnoreCase(search, search);
+                drugsPage = drugRepository.findByNameContainingIgnoreCaseOrManufacturerContainingIgnoreCase(
+                    search, search, pageable);
             } else {
-                drugs = drugRepository.findAll(); // Otherwise, list all drugs
+                drugsPage = drugRepository.findAll(pageable);
             }
 
-            model.addAttribute("drugs", drugs); // Pass the drugs list to the view
+            model.addAttribute("drugs", drugsPage.getContent());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", drugsPage.getTotalPages());
+            model.addAttribute("totalItems", drugsPage.getTotalElements());
             model.addAttribute("search", search);
-            return "drugs/list"; // Return the Thymeleaf view page to show
+            model.addAttribute("sortBy", sortBy);
+            model.addAttribute("direction", direction);
+            return "drugs/list";
         } catch (Exception e) {
             logger.error("Error listing drugs: ", e);
             model.addAttribute("errorMessage", "Error loading drugs. Please try again later.");
@@ -64,6 +84,7 @@ public class DrugController {
     // 2. SHOW FORM TO ADD NEW DRUG
     // ================================
     @GetMapping("/new")
+    @Transactional(readOnly = true)
     public String showDrugForm(Model model) {
         try {
             Drug drug = new Drug();
@@ -116,6 +137,7 @@ public class DrugController {
     // 3. SAVE NEW DRUG
     // ================================
     @PostMapping
+    @Transactional
     public String createDrug(@Valid @ModelAttribute Drug drug, 
                            BindingResult bindingResult,
                            @RequestParam(name = "diseaseId") Long diseaseId,
@@ -131,10 +153,12 @@ public class DrugController {
             }
 
             // Find disease by ID and link it to the drug
-            Diseases disease = diseasesRepository.findById(diseaseId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid disease ID"));
+            Optional<Diseases> diseaseOpt = diseasesRepository.findById(diseaseId);
+            if (!diseaseOpt.isPresent()) {
+                throw new IllegalArgumentException("Invalid disease ID");
+            }
             
-            drug.setDisease(disease); // Set the disease reference in the drug
+            drug.setDisease(diseaseOpt.get()); // Set the disease reference in the drug
             
             // Validate drug category
             if (drug.getDrugCategory() == null) {
@@ -170,12 +194,15 @@ public class DrugController {
     // 4. SHOW FORM TO EDIT A DRUG
     // ================================
     @GetMapping("/{id}/edit")
+    @Transactional(readOnly = true)
     public String showEditForm(@PathVariable(name = "id") Long id, Model model) {
         try {
-            Drug drug = drugRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid drug ID"));
+            Optional<Drug> drugOpt = drugRepository.findById(id);
+            if (!drugOpt.isPresent()) {
+                throw new IllegalArgumentException("Invalid drug ID");
+            }
             
-            model.addAttribute("drug", drug); // Add drug to model for form
+            model.addAttribute("drug", drugOpt.get());
             model.addAttribute("diseases", diseasesRepository.findAll()); // Add all diseases for dropdown
             model.addAttribute("drugCategories", DrugCategory.values());
             return "drugs/form"; // Reuse same form page for editing
@@ -189,6 +216,7 @@ public class DrugController {
     // 5. UPDATE EXISTING DRUG
     // ================================
     @PostMapping("/{id}")
+    @Transactional
     public String updateDrug(@PathVariable Long id,
                            @Valid @ModelAttribute Drug drug,
                            BindingResult bindingResult,
@@ -202,8 +230,12 @@ public class DrugController {
                 return "drugs/form";
             }
 
-            Drug existingDrug = drugRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid drug ID"));
+            Optional<Drug> existingDrugOpt = drugRepository.findById(id);
+            if (!existingDrugOpt.isPresent()) {
+                throw new IllegalArgumentException("Invalid drug ID");
+            }
+
+            Drug existingDrug = existingDrugOpt.get();
 
             // Update drug properties
             existingDrug.setName(drug.getName());
@@ -217,9 +249,11 @@ public class DrugController {
             existingDrug.setSideEffects(drug.getSideEffects());
 
             // Update disease
-            Diseases disease = diseasesRepository.findById(diseaseId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid disease ID"));
-            existingDrug.setDisease(disease);
+            Optional<Diseases> diseaseOpt = diseasesRepository.findById(diseaseId);
+            if (!diseaseOpt.isPresent()) {
+                throw new IllegalArgumentException("Invalid disease ID");
+            }
+            existingDrug.setDisease(diseaseOpt.get());
 
             drugRepository.save(existingDrug);
             
@@ -238,8 +272,14 @@ public class DrugController {
     // 6. DELETE DRUG
     // ================================
     @GetMapping("/{id}/delete")
+    @Transactional
     public String deleteDrug(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
+            Optional<Drug> drugOpt = drugRepository.findById(id);
+            if (!drugOpt.isPresent()) {
+                throw new IllegalArgumentException("Invalid drug ID");
+            }
+            
             drugRepository.deleteById(id);
             redirectAttributes.addFlashAttribute("successMessage", "Drug deleted successfully!");
         } catch (Exception e) {

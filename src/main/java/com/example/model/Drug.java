@@ -1,13 +1,12 @@
+// Entity class representing drugs in the medical system
+// Maps to the 'drugs' table in the database
 package com.example.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
 @Table(name = "drugs")
@@ -16,17 +15,22 @@ public class Drug {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;  // For optimistic locking
+
     @NotBlank(message = "Drug name is required")
+    @Size(min = 2, max = 100, message = "Drug name must be between 2 and 100 characters")
     @Column(nullable = false)
     private String name;
 
     @NotBlank(message = "Manufacturer is required")
+    @Size(min = 2, max = 100, message = "Manufacturer name must be between 2 and 100 characters")
     @Column(nullable = false)
     private String manufacturer;
 
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.0", inclusive = true, message = "Price must be greater than or equal to 0")
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
     @NotNull(message = "Quantity is required")
@@ -39,35 +43,40 @@ public class Drug {
     private LocalDate expiryDate;
 
     @NotNull(message = "Drug category is required")
-    @Column(name = "drug_category")
     @Enumerated(EnumType.STRING)
+    @Column(name = "drug_category", nullable = false)
     private DrugCategory drugCategory;
 
-    @Column(name = "side_effects")
+    @Size(max = 1000, message = "Side effects description cannot exceed 1000 characters")
+    @Column(name = "side_effects", length = 1000)
     private String sideEffects;
 
+    @Pattern(regexp = "^[0-9]+(\\.[0-9]+)?\\s*(mg|g|ml|L|IU)$", 
+             message = "Strength must be in format: number followed by unit (e.g., 500mg, 1g, 100ml)")
     @Column
     private String strength;
 
-    @Column
+    @Size(max = 500, message = "Description cannot exceed 500 characters")
+    @Column(length = 500)
     private String description;
 
     @NotNull(message = "Disease is required")
-    @ManyToOne
-    @JoinColumn(name = "disease_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "disease_id", nullable = false)
     private Diseases disease;
 
-    // No-arg constructor required by JPA
+    // Default constructor required by JPA
     public Drug() {}
 
-    // Parameterized constructor
+    // Parameterized constructor with validation
     public Drug(String name, String manufacturer, LocalDate expiryDate, 
-                double price, int quantity, String description, String sideEffects,
-                String strength, DrugCategory drugCategory, Diseases disease) {
+                BigDecimal price, Integer quantity, String description, 
+                String sideEffects, String strength, DrugCategory drugCategory, 
+                Diseases disease) {
         this.name = name;
         this.manufacturer = manufacturer;
         this.expiryDate = expiryDate;
-        this.price = BigDecimal.valueOf(price);
+        this.price = price;
         this.quantity = quantity;
         this.description = description;
         this.sideEffects = sideEffects;
@@ -83,6 +92,14 @@ public class Drug {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public String getName() {
@@ -106,6 +123,9 @@ public class Drug {
     }
 
     public void setPrice(BigDecimal price) {
+        if (price != null && price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Price cannot be negative");
+        }
         this.price = price;
     }
 
@@ -114,6 +134,9 @@ public class Drug {
     }
 
     public void setQuantity(Integer quantity) {
+        if (quantity != null && quantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative");
+        }
         this.quantity = quantity;
     }
 
@@ -122,6 +145,9 @@ public class Drug {
     }
 
     public void setExpiryDate(LocalDate expiryDate) {
+        if (expiryDate != null && expiryDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Expiry date must be in the future");
+        }
         this.expiryDate = expiryDate;
     }
 
@@ -163,5 +189,60 @@ public class Drug {
 
     public void setDisease(Diseases disease) {
         this.disease = disease;
+    }
+
+    // Business logic methods
+    public boolean isExpired() {
+        return expiryDate != null && expiryDate.isBefore(LocalDate.now());
+    }
+
+    public boolean isLowStock(int threshold) {
+        return quantity != null && quantity <= threshold;
+    }
+
+    // Equals and HashCode methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Drug drug = (Drug) o;
+        return Objects.equals(id, drug.id) &&
+                Objects.equals(version, drug.version) &&
+                Objects.equals(name, drug.name) &&
+                Objects.equals(manufacturer, drug.manufacturer) &&
+                Objects.equals(price, drug.price) &&
+                Objects.equals(quantity, drug.quantity) &&
+                Objects.equals(expiryDate, drug.expiryDate) &&
+                drugCategory == drug.drugCategory &&
+                Objects.equals(sideEffects, drug.sideEffects) &&
+                Objects.equals(strength, drug.strength) &&
+                Objects.equals(description, drug.description) &&
+                Objects.equals(disease, drug.disease);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, version, name, manufacturer, price, quantity, 
+                          expiryDate, drugCategory, sideEffects, strength, 
+                          description, disease);
+    }
+
+    // ToString method
+    @Override
+    public String toString() {
+        return "Drug{" +
+                "id=" + id +
+                ", version=" + version +
+                ", name='" + name + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", expiryDate=" + expiryDate +
+                ", drugCategory=" + drugCategory +
+                ", sideEffects='" + sideEffects + '\'' +
+                ", strength='" + strength + '\'' +
+                ", description='" + description + '\'' +
+                ", disease=" + disease +
+                '}';
     }
 } 
