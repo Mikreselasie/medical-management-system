@@ -20,20 +20,7 @@ public enum DrugCategory {
     ANTIDIABETIC("Controls blood sugar (e.g., metformin)"),
     ANTIHISTAMINE("Treats allergies (e.g., cetirizine)"),
     COUGH_MEDICATION("Relieves cough or mucus (e.g., codeine, guaifenesin)"),
-    VITAMIN("Supports health or deficiency (e.g., vitamin D)"),
-    ANTICOAGULANT("Prevents blood clotting (e.g., warfarin, heparin)"),
-    ANTIPLATELET("Prevents platelet aggregation (e.g., aspirin, clopidogrel)"),
-    LIPID_LOWERING_AGENT("Reduces cholesterol levels (e.g., atorvastatin)"),
-    ANTACID("Neutralizes stomach acid (e.g., aluminum hydroxide)"),
-    PROTON_PUMP_INHIBITOR("Reduces stomach acid production (e.g., omeprazole)"),
-    H2_BLOCKER("Reduces stomach acid (e.g., ranitidine)"),
-    IMMUNOSUPPRESSANT("Suppresses immune response (e.g., cyclosporine)"),
-    VACCINE("Prevents infectious diseases (e.g., MMR, COVID-19 vaccine)"),
-    CONTRACEPTIVE("Prevents pregnancy (e.g., oral contraceptives)"),
-    MUSCLE_RELAXANT("Relieves muscle spasms (e.g., baclofen)"),
-    SEDATIVE("Calms or induces sleep (e.g., phenobarbital)"),
-    LOCAL_ANTISEPTIC("Prevents infection on skin wounds (e.g., povidone-iodine)");
-
+    VITAMIN("Supports health or deficiency (e.g., vitamin D)");
 
     private final String description;
 
