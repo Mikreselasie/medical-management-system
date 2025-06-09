@@ -17,6 +17,7 @@ import com.example.repository.DrugRepository;
 import com.example.repository.DiseasesRepository;
 
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 
 // Marks this class as a Spring MVC controller
@@ -123,7 +124,16 @@ public class DrugController {
                 return "drugs/form";
             }
 
-            drugRepository.save(drug); // Save drug to database
+            // Set default values if not provided
+            if (drug.getQuantity() == null) {
+                drug.setQuantity(0);
+            }
+            if (drug.getPrice() == null) {
+                drug.setPrice(BigDecimal.ZERO);
+            }
+
+            // Save drug to database
+            Drug savedDrug = drugRepository.save(drug);
             
             redirectAttributes.addFlashAttribute("successMessage", "Drug added successfully!");
             return "redirect:/drugs"; // Redirect to drug list after saving

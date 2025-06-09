@@ -67,8 +67,12 @@
                         <td th:text="${patient.address}"></td>
                         <td th:text="${patient.painStrength}"></td>
                         <td>
-                            <span th:each="disease : ${patient.diseases}" th:text="${disease.diseaseType}" th:unless="${#lists.isEmpty(patient.diseases)}"></span>
-                            <span th:if="${#lists.isEmpty(patient.diseases)}">None</span>
+                            <span th:if="${patient.diseases != null && !patient.diseases.isEmpty()}" 
+                                  th:each="disease, iterStat : ${patient.diseases}">
+                                <span th:text="${disease.diseaseType != null ? disease.diseaseType : 'Unknown'}"></span>
+                                <span th:if="${!iterStat.last}">, </span>
+                            </span>
+                            <span th:if="${patient.diseases == null || patient.diseases.isEmpty()}">None</span>
                         </td>
                         <td>
                             <div class="btn-group" role="group">

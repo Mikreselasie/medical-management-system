@@ -117,6 +117,7 @@ public class PatientController {
                              RedirectAttributes redirectAttributes) {
         try {
             if (result.hasErrors()) {
+                // Add necessary attributes for form re-rendering
                 model.addAttribute("diseases", diseasesRepository.findAll());
                 model.addAttribute("genders", Gender.values());
                 model.addAttribute("strengths", Strength.values());
@@ -133,7 +134,13 @@ public class PatientController {
                 patient.setDiseases(new ArrayList<>());
             }
 
-            // Save the patient first to get the ID
+            // Generate patient ID if not set
+            if (patient.getPatientId() == null || patient.getPatientId().trim().isEmpty()) {
+                String patientId = "PAT" + System.currentTimeMillis();
+                patient.setPatientId(patientId);
+            }
+
+            // Save the patient
             Patient savedPatient = patientRepository.save(patient);
 
             // Now handle diseases

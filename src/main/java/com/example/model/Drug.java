@@ -3,6 +3,11 @@ package com.example.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "drugs")
@@ -11,21 +16,29 @@ public class Drug {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Drug name is required")
     @Column(nullable = false)
     private String name;
 
+    @NotBlank(message = "Manufacturer is required")
     @Column(nullable = false)
     private String manufacturer;
 
+    @NotNull(message = "Price is required")
+    @DecimalMin(value = "0.0", inclusive = true, message = "Price must be greater than or equal to 0")
     @Column(nullable = false)
     private BigDecimal price;
 
+    @NotNull(message = "Quantity is required")
+    @Min(value = 0, message = "Quantity must be greater than or equal to 0")
     @Column(nullable = false)
     private Integer quantity;
 
+    @Future(message = "Expiry date must be in the future")
     @Column(name = "expiry_date")
     private LocalDate expiryDate;
 
+    @NotNull(message = "Drug category is required")
     @Column(name = "drug_category")
     @Enumerated(EnumType.STRING)
     private DrugCategory drugCategory;
@@ -39,6 +52,7 @@ public class Drug {
     @Column
     private String description;
 
+    @NotNull(message = "Disease is required")
     @ManyToOne
     @JoinColumn(name = "disease_id")
     private Diseases disease;
