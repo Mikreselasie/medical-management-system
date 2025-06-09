@@ -303,7 +303,7 @@ public class PatientController {
         }
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/{id}/delete")
     public String deletePatient(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             patientRepository.deleteById(id);
