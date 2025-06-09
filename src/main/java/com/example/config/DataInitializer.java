@@ -55,16 +55,13 @@ public class DataInitializer implements CommandLineRunner {
             if (diseasesRepository.count() == 0) {
                 logger.info("Initializing diseases...");
                 List<Diseases> diseases = new ArrayList<>();
-                diseases.add(new Diseases(Diseases.DiseaseType.HYPERTENSION));
-                diseases.add(new Diseases(Diseases.DiseaseType.DIABETES));
-                diseases.add(new Diseases(Diseases.DiseaseType.ASTHMA));
-                diseases.add(new Diseases(Diseases.DiseaseType.ARTHRITIS));
-                diseases.add(new Diseases(Diseases.DiseaseType.HEART_DISEASE));
-                diseases.add(new Diseases(Diseases.DiseaseType.BREAST_CANCER));
-                diseases.add(new Diseases(Diseases.DiseaseType.CONGESTIVE_HEART_FAILURE));
-                diseases.add(new Diseases(Diseases.DiseaseType.COPD));
-                diseases.add(new Diseases(Diseases.DiseaseType.KIDNEY_FAILURE));
-                diseases.add(new Diseases(Diseases.DiseaseType.PARKINSONS));
+                
+                // Add all disease types
+                for (Diseases.DiseaseType type : Diseases.DiseaseType.values()) {
+                    if (type != Diseases.DiseaseType.UNKNOWN) {  // Skip UNKNOWN type
+                        diseases.add(new Diseases(type));
+                    }
+                }
                 
                 diseasesRepository.saveAll(diseases);
                 logger.info("Successfully initialized {} diseases", diseases.size());
