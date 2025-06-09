@@ -336,14 +336,14 @@ public class PatientController {
             Optional<Patient> patientOpt = patientRepository.findById(id);
             if (patientOpt.isPresent()) {
                 Patient patient = patientOpt.get();
-                // Clear the diseases list before deletion
-                patient.setDiseases(new ArrayList<>());
+                // Clear the diseases list first to remove the associations
+                patient.getDiseases().clear();
                 patientRepository.save(patient);
-                // Now delete the patient
+                // Now we can safely delete the patient
                 patientRepository.deleteById(id);
-                redirectAttributes.addFlashAttribute("success", "Patient deleted successfully");
+                redirectAttributes.addFlashAttribute("success", "Patient deleted successfully!");
             } else {
-                redirectAttributes.addFlashAttribute("error", "Patient not found");
+                redirectAttributes.addFlashAttribute("error", "Patient not found!");
             }
         } catch (Exception e) {
             logger.error("Error deleting patient: ", e);
