@@ -47,48 +47,35 @@ public class DrugController {
     // 1. LIST ALL DRUGS + SEARCH
     // ================================
     @GetMapping
-    public String listDrugs(
-            @RequestParam(required = false, name = "search") String search,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction,
-            Model model) {
+    public String listDrugs(Model model, 
+                           @RequestParam(required = false) String search,
+                           @RequestParam(defaultValue = "0") int page,
+                           @RequestParam(defaultValue = "10") int size) {
         try {
-            logger.info("Listing drugs with search: {}, page: {}, size: {}, sortBy: {}, direction: {}", 
-                       search, page, size, sortBy, direction);
+            logger.info("Listing drugs with search: {}, page: {}, size: {}", search, page, size);
             
-            Pageable pageable = PageRequest.of(page, size, 
-                Sort.Direction.fromString(direction), sortBy);
-            
+            Pageable pageable = PageRequest.of(page, size);
             Page<Drug> drugsPage;
+            
             if (search != null && !search.trim().isEmpty()) {
-                drugsPage = drugRepository.findByNameContainingIgnoreCaseOrManufacturerContainingIgnoreCase(
-                    search, search, pageable);
+                drugsPage = drugRepository.findByNameContainingIgnoreCase(search, pageable);
             } else {
                 drugsPage = drugRepository.findAll(pageable);
             }
-
-            // Initialize empty list if null
-            List<Drug> drugs = drugsPage.getContent();
-            if (drugs == null) {
-                drugs = new ArrayList<>();
-            }
-
-            model.addAttribute("drugs", drugs);
+            
+            logger.info("Successfully retrieved {} drugs", drugsPage.getTotalElements());
+            
+            model.addAttribute("drugs", drugsPage.getContent());
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", drugsPage.getTotalPages());
             model.addAttribute("totalItems", drugsPage.getTotalElements());
             model.addAttribute("search", search);
-            model.addAttribute("sortBy", sortBy);
-            model.addAttribute("direction", direction);
             
-            logger.info("Successfully retrieved {} drugs", drugs.size());
             return "drugs/list";
         } catch (Exception e) {
-            logger.error("Error listing drugs: ", e);
-            model.addAttribute("errorMessage", "Error loading drugs. Please try again later.");
-            model.addAttribute("drugs", new ArrayList<>()); // Return empty list on error
+            logger.error("Error listing drugs", e);
+            model.addAttribute("errorMessage", "Error loading drugs: " + e.getMessage());
+            model.addAttribute("drugs", new ArrayList<>());
             return "drugs/list";
         }
     }

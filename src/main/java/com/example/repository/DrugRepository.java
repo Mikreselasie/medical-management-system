@@ -12,4 +12,5 @@ public interface DrugRepository extends JpaRepository<Drug, Long> {
     List<Drug> findByQuantityGreaterThan(int quantity);
     Page<Drug> findByNameContainingIgnoreCaseOrManufacturerContainingIgnoreCase(
         String name, String manufacturer, Pageable pageable);
+    Page<Drug> findByNameContainingIgnoreCase(String name, Pageable pageable);
 } 

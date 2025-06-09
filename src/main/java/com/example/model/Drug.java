@@ -61,8 +61,8 @@ public class Drug {
     private String description;
 
     @NotNull(message = "Disease is required")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "disease_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "disease_id")
     private Diseases disease;
 
     // Default constructor required by JPA
