@@ -6,25 +6,38 @@ import com.example.service.DrugSaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.List;
 
 @Service
 @Transactional
 public class DrugSaleServiceImpl implements DrugSaleService {
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Autowired
     private DrugSaleRepository drugSaleRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<DrugSale> getAllSales() {
-        return drugSaleRepository.findAll();
+        return entityManager.createQuery(
+            "SELECT DISTINCT s FROM DrugSale s LEFT JOIN FETCH s.drug", 
+            DrugSale.class
+        ).getResultList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DrugSale getSaleById(Long id) {
-        return drugSaleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Drug sale not found"));
+        return entityManager.createQuery(
+            "SELECT s FROM DrugSale s LEFT JOIN FETCH s.drug WHERE s.id = :id", 
+            DrugSale.class
+        )
+        .setParameter("id", id)
+        .getSingleResult();
     }
 
     @Override

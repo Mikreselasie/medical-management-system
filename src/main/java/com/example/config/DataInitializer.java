@@ -42,13 +42,17 @@ public class DataInitializer implements CommandLineRunner {
                     logger.warn("Found invalid disease type in database: {}", disease);
                     hasInvalidTypes = true;
                     
-                    // Special handling for "CANCER" type
-                    if (disease.getDiseaseType().toString().equals("CANCER")) {
+                    // Special handling for various disease types
+                    String diseaseTypeStr = disease.getDiseaseType().toString();
+                    if (diseaseTypeStr.equals("CANCER")) {
                         logger.info("Converting generic CANCER type to BREAST_CANCER");
                         disease.setDiseaseType(Diseases.DiseaseType.BREAST_CANCER);
-                    } else if (disease.getDiseaseType().toString().equals("DIABETES")) {
+                    } else if (diseaseTypeStr.equals("DIABETES")) {
                         logger.info("Converting generic DIABETES type to DIABETES_TYPE_2");
                         disease.setDiseaseType(Diseases.DiseaseType.DIABETES_TYPE_2);
+                    } else if (diseaseTypeStr.equals("ARTHRITIS")) {
+                        logger.info("Converting generic ARTHRITIS type to OSTEOARTHRITIS");
+                        disease.setDiseaseType(Diseases.DiseaseType.OSTEOARTHRITIS);
                     } else {
                         // Set to UNKNOWN type for other invalid types
                         disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
