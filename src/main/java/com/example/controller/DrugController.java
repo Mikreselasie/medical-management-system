@@ -89,7 +89,8 @@ public class DrugController {
             return "drugs/form";
         } catch (Exception e) {
             logger.error("Error showing drug form: ", e);
-            return "redirect:/drugs?error=Error loading form";
+            model.addAttribute("errorMessage", "Error loading form: " + e.getMessage());
+            return "redirect:/drugs";
         }
     }
 
@@ -105,6 +106,7 @@ public class DrugController {
         
         try {
             if (bindingResult.hasErrors()) {
+                logger.error("Form validation errors: {}", bindingResult.getAllErrors());
                 model.addAttribute("diseases", diseasesRepository.findAll());
                 model.addAttribute("drugCategories", DrugCategory.values());
                 return "drugs/form";
