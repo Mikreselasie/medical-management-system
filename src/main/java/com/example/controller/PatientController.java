@@ -114,7 +114,8 @@ public class PatientController {
     public String savePatient(@Valid @ModelAttribute Patient patient,
                              BindingResult result,
                              Model model,
-                             RedirectAttributes redirectAttributes) {
+                             RedirectAttributes redirectAttributes,
+                             HttpServletRequest request) {
         try {
             if (result.hasErrors()) {
                 // Add necessary attributes for form re-rendering
@@ -129,9 +130,23 @@ public class PatientController {
                 patient.setAddress(new Address());
             }
 
-            // Initialize diseases list if null
-            if (patient.getDiseases() == null) {
-                patient.setDiseases(new ArrayList<>());
+            // Initialize diseases list
+            patient.setDiseases(new ArrayList<>());
+
+            // Handle diseases selection
+            String[] diseaseIds = request.getParameterValues("diseases");
+            if (diseaseIds != null && diseaseIds.length > 0) {
+                for (String diseaseId : diseaseIds) {
+                    try {
+                        Long diseaseIdLong = Long.parseLong(diseaseId);
+                        Optional<Diseases> disease = diseasesRepository.findById(diseaseIdLong);
+                        if (disease.isPresent()) {
+                            patient.getDiseases().add(disease.get());
+                        }
+                    } catch (NumberFormatException e) {
+                        logger.warn("Invalid disease ID: {}", diseaseId);
+                    }
+                }
             }
 
             // Generate patient ID if not set
@@ -145,22 +160,6 @@ public class PatientController {
 
             // Save the patient
             Patient savedPatient = patientRepository.save(patient);
-
-            // Now handle diseases
-            if (savedPatient.getDiseases() != null) {
-                List<Diseases> validDiseases = new ArrayList<>();
-                for (Diseases disease : savedPatient.getDiseases()) {
-                    if (disease != null && disease.getId() != null) {
-                        Optional<Diseases> existingDisease = diseasesRepository.findById(disease.getId());
-                        if (existingDisease.isPresent()) {
-                            validDiseases.add(existingDisease.get());
-                        }
-                    }
-                }
-                savedPatient.setDiseases(validDiseases);
-                savedPatient = patientRepository.save(savedPatient);
-            }
-
             redirectAttributes.addFlashAttribute("success", "Patient saved successfully");
             return "redirect:/patients/list";
         } catch (Exception e) {
@@ -309,8 +308,18 @@ public class PatientController {
     @GetMapping("/{id}/delete")
     public String deletePatient(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            patientRepository.deleteById(id);
-            redirectAttributes.addFlashAttribute("success", "Patient deleted successfully");
+            Optional<Patient> patientOpt = patientRepository.findById(id);
+            if (patientOpt.isPresent()) {
+                Patient patient = patientOpt.get();
+                // Clear the diseases list before deletion
+                patient.setDiseases(new ArrayList<>());
+                patientRepository.save(patient);
+                // Now delete the patient
+                patientRepository.deleteById(id);
+                redirectAttributes.addFlashAttribute("success", "Patient deleted successfully");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Patient not found");
+            }
         } catch (Exception e) {
             logger.error("Error deleting patient: ", e);
             redirectAttributes.addFlashAttribute("error", "Error deleting patient: " + e.getMessage());
