@@ -8,7 +8,7 @@
 <body>
     <nav th:fragment="navbar" class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" th:href="@{/}">
                 <i class="fas fa-hospital me-2"></i>
                 Medical Management System
             </a>
@@ -18,32 +18,32 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">
+                        <a class="nav-link" th:href="@{/}">
                             <i class="fas fa-home me-1"></i> Home
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/patients">
+                        <a class="nav-link" th:href="@{/patients}">
                             <i class="fas fa-user-injured me-1"></i> Patients
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/doctors">
+                        <a class="nav-link" th:href="@{/doctors}">
                             <i class="fas fa-user-md me-1"></i> Doctors
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/pharmacists">
+                        <a class="nav-link" th:href="@{/pharmacists}">
                             <i class="fas fa-user-nurse me-1"></i> Pharmacists
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/drugs">
+                        <a class="nav-link" th:href="@{/drugs}">
                             <i class="fas fa-pills me-1"></i> Drugs
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/drug-sales">
+                        <a class="nav-link" th:href="@{/drug-sales}">
                             <i class="fas fa-shopping-cart me-1"></i> Drug Sales
                         </a>
                     </li>
