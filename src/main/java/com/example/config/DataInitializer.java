@@ -46,6 +46,9 @@ public class DataInitializer implements CommandLineRunner {
                     if (disease.getDiseaseType().toString().equals("CANCER")) {
                         logger.info("Converting generic CANCER type to BREAST_CANCER");
                         disease.setDiseaseType(Diseases.DiseaseType.BREAST_CANCER);
+                    } else if (disease.getDiseaseType().toString().equals("DIABETES")) {
+                        logger.info("Converting generic DIABETES type to DIABETES_TYPE_2");
+                        disease.setDiseaseType(Diseases.DiseaseType.DIABETES_TYPE_2);
                     } else {
                         // Set to UNKNOWN type for other invalid types
                         disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
