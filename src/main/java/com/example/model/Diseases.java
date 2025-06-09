@@ -67,6 +67,7 @@ public class Diseases {
         DERMATITIS("Topical steroids, Antihistamines"),
 
         // Cancer Types
+        CANCER("Surgery, Chemotherapy, Radiation therapy"),
         BREAST_CANCER("Surgery, Chemotherapy, Radiation therapy"),
         LUNG_CANCER("Surgery, Chemotherapy, Targeted therapy"),
         PROSTATE_CANCER("Hormone therapy, Radiation therapy"),
