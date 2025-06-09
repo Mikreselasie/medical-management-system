@@ -30,6 +30,28 @@ public class DataInitializer implements CommandLineRunner {
 
     private void initializeDiseases() {
         try {
+            // First, check for and fix any invalid disease types
+            List<Diseases> existingDiseases = diseasesRepository.findAll();
+            boolean hasInvalidTypes = false;
+            
+            for (Diseases disease : existingDiseases) {
+                try {
+                    // This will throw an exception if the disease type is invalid
+                    disease.getDiseaseType();
+                } catch (Exception e) {
+                    logger.warn("Found invalid disease type in database: {}", disease);
+                    hasInvalidTypes = true;
+                    // Set to UNKNOWN type
+                    disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
+                    diseasesRepository.save(disease);
+                }
+            }
+            
+            if (hasInvalidTypes) {
+                logger.info("Fixed invalid disease types in database");
+            }
+
+            // Then proceed with initialization if needed
             if (diseasesRepository.count() == 0) {
                 logger.info("Initializing diseases...");
                 List<Diseases> diseases = new ArrayList<>();

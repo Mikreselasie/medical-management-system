@@ -85,40 +85,29 @@ public class PatientController {
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         try {
-            // Create a new patient with default values
             Patient patient = new Patient();
-            patient.setAddress(new Address());
-            patient.setDiseases(new ArrayList<>());
             model.addAttribute("patient", patient);
-
-            // Load diseases and sort them by type
+            
+            // Load diseases and handle any invalid types
             List<Diseases> diseases = diseasesRepository.findAll();
-            if (diseases == null || diseases.isEmpty()) {
-                logger.warn("No diseases found in the database. Initializing diseases...");
-                // Initialize diseases if none exist
-                for (Diseases.DiseaseType type : Diseases.DiseaseType.values()) {
-                    Diseases disease = new Diseases(type);
+            boolean hasInvalidTypes = false;
+            
+            for (Diseases disease : diseases) {
+                try {
+                    // This will throw an exception if the disease type is invalid
+                    disease.getDiseaseType();
+                } catch (Exception e) {
+                    logger.warn("Found invalid disease type in database: {}", disease);
+                    hasInvalidTypes = true;
+                    // Set to UNKNOWN type
+                    disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
                     diseasesRepository.save(disease);
                 }
+            }
+            
+            if (hasInvalidTypes) {
+                logger.info("Fixed invalid disease types in database");
                 diseases = diseasesRepository.findAll();
-            } else {
-                // Check for and fix any invalid disease types
-                boolean hasInvalidTypes = false;
-                for (Diseases disease : diseases) {
-                    try {
-                        // This will throw an exception if the disease type is invalid
-                        disease.getDiseaseType();
-                    } catch (Exception e) {
-                        logger.warn("Found invalid disease type in database: {}", disease);
-                        hasInvalidTypes = true;
-                        // Set to UNKNOWN type
-                        disease.setDiseaseType(Diseases.DiseaseType.UNKNOWN);
-                        diseasesRepository.save(disease);
-                    }
-                }
-                if (hasInvalidTypes) {
-                    diseases = diseasesRepository.findAll();
-                }
             }
             
             // Sort diseases by type name
